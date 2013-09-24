@@ -1,0 +1,149 @@
+<?php
+// $Id$
+module_load_include('php', 'constant_contact', 'constant_contact.config');
+
+/**
+ * @file
+ */
+
+/**
+ * Implementation of hook_requirements().
+ * This helps admin know if the module is functioning correctly.
+ */
+function constant_contact_requirements($phase)
+{
+	$requirements = array();
+
+	if($phase == 'runtime'):
+		// running the module...
+	else:
+		// installing...
+		if(!extension_loaded('xml'))
+		{
+			$requirements['constant_contact']['xml'] = array(
+			'value' => t('XML extension Not installed'),
+			'severity' => REQUIREMENT_ERROR,
+			'description' => t('The XML extension for PHP is missing or outdated. Please check the PHP XML documentation for information on how to correct this.'),
+			);
+			$requirements['constant_contact']['xml']['title'] = t('Constant Contact');
+		}
+
+		if(!extension_loaded('curl'))
+		{
+			$requirements['constant_contact']['curl'] = array(
+			'value' => t('curl extension Not installed'),
+			'severity' => REQUIREMENT_ERROR,
+			'description' => t('The curl extension for PHP is missing or outdated. Please check the PHP curl documentation at www.php.net/curl for information on how to correct this.'),
+			);
+			$requirements['constant_contact']['curl']['title'] = t('Constant Contact');
+		}
+	endif;
+
+	return $requirements;
+}
+
+
+/**
+ * Installs the variables we need for the module
+ */
+function constant_contact_install()
+{
+	// list of all extra fields the API supports
+	$cc_extra_fields = array(
+		'First Name',
+		'Middle Name',
+		'Last Name',
+		'Job Title',
+		'Company Name',
+		'Home Phone',
+		'Work Phone',
+		'Addr1','Addr2','Addr3',
+		'City',
+		'State Code',
+		'State Name',
+		'Country Code',
+		'Country Name',
+		'Postal Code',
+		'Sub Postal Code',
+		'Note',
+		'CustomField1',
+		'CustomField2',
+		'CustomField3',
+		'CustomField4',
+		'CustomField5',
+		'CustomField6',
+		'CustomField7',
+		'CustomField8',
+		'CustomField9',
+		'CustomField10',
+		'CustomField11',
+		'CustomField12',
+		'CustomField13',
+		'CustomField14',
+		'CustomField15',
+	);
+
+	// build the mappings
+	$fields = array();
+	foreach($cc_extra_fields as $field):
+		$fields[] = str_replace(' ', '', $field) . ":field_" . str_replace(' ', '_', strtolower($field));
+	endforeach;
+	$mappings = implode(', ', $fields);
+
+	// set default values
+	variable_set('cc_extra_fields', $cc_extra_fields);
+	variable_set('cc_extra_field_mappings', $mappings);
+
+	// so custom modules that hook into this module will work with a weight of 100 or more
+	db_query("UPDATE {system} SET weight = 99 WHERE name = 'constant_contact'");
+}
+
+
+/**
+ * Removes the variables we have set for the module
+ */
+function constant_contact_uninstall()
+{
+	variable_del('cc_form_block_fields');
+	variable_del('cc_extra_fields');
+	variable_del('cc_extra_field_mappings');
+	variable_del('cc_register_page_method');
+	variable_del('cc_default_opt_in');
+	variable_del('cc_contact_list_sort_order');
+	variable_del('cc_subscribe_format');
+	variable_del('cc_show_format_choice');
+	variable_del('cc_signup_title');
+	variable_del('cc_signup_description');
+	variable_del('cc_lists');
+	variable_del('cc_sync_unsubscribed_users');
+	variable_del('cc_sync_last_run');
+	variable_del('cc_block_redirect_url');
+	variable_del('cc_list_selection_format');
+	variable_del('cc_block_list_selection_format');
+	variable_del('cc_block_show_list_selection');
+	variable_del('cc_block_lists');
+	variable_del('cc_email_field_position');
+    variable_del('cc_lists_cache_expire');
+    variable_del('cc_show_new_lists');
+
+    /*
+    variable_del('cc_username');
+    variable_del('cc_password');
+    //*/
+}
+
+/**
+ * Implementation of hook_disable().
+ */
+function constant_contact_disable()
+{
+	drupal_set_message(t('The Constant Contact module has been disabled.'));
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function constant_contact_enable()
+{
+	drupal_set_message(t('The Constant Contact module has been enabled, please visit the settings page to configure your account details.'));
+}

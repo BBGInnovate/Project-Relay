@@ -1,0 +1,36 @@
+.flickr-photo-img {
+  vertical-align: text-bottom;
+}
+
+.flickr-photo-box {
+  padding: 10px;
+  float: left;
+  text-align: center;
+  width: 260px;
+  height: 260px;
+}
+
+.flickr-photoset-img {
+  vertical-align: text-bottom;
+}
+
+.flickr-photoset-box {
+  padding: 10px;
+  float: left;
+  text-align: center;
+  width: 130px;
+  height: 130px;
+}
+
+span.flickr-wrap {
+  display: inline-block;
+  vertical-align: top;
+  margin: 0 5px 5px 0;
+}
+
+span.flickr-credit {
+  display: block;
+  line-height: 100%;
+  font-size: 80%;
+}
+

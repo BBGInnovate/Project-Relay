@@ -1,0 +1,21 @@
+
+name = Media: SoundCloud
+description = Provides SoundCloud support to the Media module.
+package = "Media"
+core = 7.x
+files[] = media_soundcloud.module
+files[] = includes/MediaSoundCloudStreamWrapper.inc
+files[] = includes/MediaInternetSoundCloudHandler.inc
+files[] = includes/media_soundcloud.styles.inc
+files[] = includes/MediaSoundCloudStyles.inc
+dependencies[] = media_internet
+
+
+
+
+; Information added by drupal.org packaging script on 2013-03-20
+version = "7.x-1.0"
+core = "7.x"
+project = "media_soundcloud"
+datestamp = "1363779912"
+

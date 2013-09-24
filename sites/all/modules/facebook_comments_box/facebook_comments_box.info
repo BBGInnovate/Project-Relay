@@ -1,0 +1,10 @@
+name = Facebook Comments Box
+description = Add Facebook Comments to selected content types on your site.
+core = 7.x
+
+; Information added by drupal.org packaging script on 2012-02-14
+version = "7.x-1.1"
+core = "7.x"
+project = "facebook_comments_box"
+datestamp = "1329240049"
+

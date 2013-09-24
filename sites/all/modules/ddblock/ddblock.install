@@ -1,0 +1,82 @@
+<?php
+
+/**
+ * @file
+ * Installation file to implement the dynamic display block schema
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function ddblock_schema() {
+  $schema['ddblock_block'] = array(
+    'description' => 'The base tables for ddblocks.',
+    'fields' => array(
+      'delta' => array(
+        'description' => 'Number of the block.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'description' => 'Title of the block.',
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'module' => array(
+        'description' => 'The name of the module that provided the original block.',
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'delta_original' => array(
+        'description' => 'The delta of the original block.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '0',
+      ),
+      'enabled' => array(
+        'description' => 'Support for dynamic display block enabled.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('delta'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function ddblock_install() {
+  // TODO The drupal_(un)install_schema functions are called automatically in D7.
+  // drupal_install_schema('ddblock')
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function ddblock_uninstall() {
+  //Drop tables
+  // TODO The drupal_(un)install_schema functions are called automatically in D7.
+  // DONE these lines can be removed
+  // drupal_uninstall_schema('ddblock')
+  // Remove variables
+  // TODO Please review the conversion of this statement to the D7 database API syntax.
+  // DONE
+  /* db_query("DELETE FROM {variable} WHERE name LIKE 'ddblock_%%'") */
+  db_delete('variable')
+  ->condition('name', 'ddblock_%%', 'LIKE')
+  ->execute();
+  cache_clear_all('variables', 'cache');
+  drupal_set_message(t("Dynamic display block module uninstalled successfully."));
+}

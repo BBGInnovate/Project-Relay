@@ -14,6 +14,7 @@ settings[affixed_sidebars] = 1
 stylesheets[all][] = assets/css/bootstrap-extra.css
 stylesheets[all][] = assets/css/drupal.css
 stylesheets[all][] = assets/css/style.css
+stylesheets[all][] = assets/css/icubestyle.css
 
 scripts[] = assets/js/drupal.js
 

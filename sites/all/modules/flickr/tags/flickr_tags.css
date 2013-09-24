@@ -1,0 +1,22 @@
+ul#flickr_taglist ul {
+  padding: 0;
+}
+
+ul#flickr_taglist ul li {
+  display: inline;
+  padding: 0;
+  margin: 0 1em 0 0;
+  background: transparent none no-repeat fixed top;
+}
+
+ul#flickr_tagcloud {
+  list-style: none;
+  line-height: normal;
+}
+
+ul#flickr_tagcloud li {
+  display: inline;
+  background: transparent none no-repeat fixed top;
+  padding: 0;
+  margin: 0 0.1em 0 0;
+}

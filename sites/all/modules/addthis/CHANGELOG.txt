@@ -1,0 +1,21 @@
+Added namespace adding for Facebook Like.
+Added counter bubble orientation in Basic Toolbox display type.
+Fixed getDisplayTypes() to work with blocks. Also provide default settings always.
+Add t() to description of Google Analytics elements in config page.
+
+Removed legacy display types.
+  AddThis module contained some small non generic display types. They where
+  removed in favor of the display types added in the addthis_displays submodule.
+
+Redesigned the config page.
+  The settings page has been made more condensed and options have been merged
+  into clear categories. There are some options that where removed because of
+  legacy functionality that is now support inside the display types.
+
+Fixed default value for ui_co_brand setting.
+Added alter hook for configuration.
+Added alter hook for markup options.
+Added alter hook for markup render array.
+Fixed async loading of widget.js.
+Fix for #1308970 reported by vasike,fixed by matglas86. Error in block configure.
+Changed dir name for submodule from addthis_display to addthis_displays.

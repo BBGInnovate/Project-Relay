@@ -1,0 +1,39 @@
+<?php
+function custom_module_menu() {
+$items['custommodule/disqus/ajax'] = array(
+    'title' => t('Test'),
+    'type' => MENU_CALLBACK,
+    'page callback' => 'custom_module_disqus_ajax',
+    'access arguments' => array('access content'),
+  );
+ return $items;
+}
+function custom_module_disqus_ajax($type = 'ajax') {
+if ($type == 'ajax') {
+ $domain = $_POST['domain'];
+    $id = $_POST['id'];
+     $title = $_POST['title'];
+      $url = $_POST['url'];
+$msg = "<div id='disqus_thread'></div>
+<script type='text/javascript'>
+ /* * * CONFIGURATION VARIABLES: THIS CODE IS ONLY AN EXAMPLE * * */
+    var disqus_shortname = '$domain'; // Required - Replace example with your forum shortname
+    var disqus_identifier = '$id';
+    var disqus_title = '$title';
+    var disqus_url = '$url';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>";
+        return drupal_json_output($msg);
+
+  }
+  else {
+    $output = t("Error occured please try again or contact administrator");
+    return $output;
+  }
+}

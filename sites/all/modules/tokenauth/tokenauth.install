@@ -1,0 +1,76 @@
+<?php
+/**
+ * @file
+ * Installation routines for the Token Authentication module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function tokenauth_schema() {
+  $schema['tokenauth_tokens'] = array(
+    'description' => 'Stores information about each user\'s token',
+    'fields' => array(
+      'uid' => array(
+        'description' => 'The user\'s {users}.uid',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+      ),
+      'token' => array(
+        'description' => 'The user specific token',
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('token'),
+    'unique keys' => array(
+      'uid_key' => array('uid')
+    ),
+  );
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function tokenauth_install() {
+  // Tokenauth must authenticate the user before other modules can deny anonymous access.
+  db_query("UPDATE {system} SET weight='-15' WHERE name='tokenauth'");
+}
+
+/**
+ * Implements hook_enable().
+ */
+function tokenauth_enable() {
+  // Assign tokens for each user.
+  $results = db_query("SELECT u.uid FROM {users} u LEFT JOIN {tokenauth_tokens} tt ON u.uid = tt.uid WHERE tt.token IS NULL AND u.uid > 0");
+  foreach ($results as $row) {
+    tokenauth_insert($row->uid);
+  }
+  // Clean up orphaned tokens from users removed while module disabled
+  db_query("DELETE tt.* FROM {tokenauth_tokens} tt WHERE NOT EXISTS (SELECT * FROM {users} u WHERE u.uid=tt.uid)");
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function tokenauth_uninstall() {
+  variable_del('tokenauth_length');
+  variable_del('tokenauth_pages');
+  variable_del('tokenauth_reset');
+  variable_del('tokenauth_text');
+}
+
+/**
+ * Migrate tokenauth settings.
+ */
+function tokenauth_update_7000() {
+  $text = variable_get('tokenauth_text', array());
+  if (!empty($text)) {
+    // Formerly the default format, no longer the case.
+    $text['format'] = 'filtered_html';
+    variable_set('tokenauth_text', $text);
+  }
+}

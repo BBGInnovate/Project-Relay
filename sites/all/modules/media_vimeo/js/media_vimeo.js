@@ -39,7 +39,7 @@ Drupal.media_vimeo.needFlash = function () {
   var wrapper = $('.media-vimeo-preview-wrapper');
   var hw = Drupal.settings.media_vimeo[id].height / Drupal.settings.media_vimeo[id].width;
   wrapper.html('<div class="js-fallback">' + Drupal.t('You need Flash to watch this video. <a href="@flash">Get Flash</a>', {'@flash':'http://get.adobe.com/flashplayer'}) + '</div>');
-  wrapper.height(wrapper.width() * hw);
+ // wrapper.height(wrapper.width() * hw);
 };
 
 Drupal.media_vimeo.insertEmbed = function (embed_id) {
@@ -47,7 +47,7 @@ Drupal.media_vimeo.insertEmbed = function (embed_id) {
   var settings = Drupal.settings.media_vimeo[embed_id];
 
   // Calculate the ratio of the dimensions of the embed.
-  settings.hw = settings.height / settings.width;
+  //settings.hw = settings.height / settings.width;
 
   // Replace the object embed with Vimeo's iframe. This isn't done by the
   // theme function because Vimeo doesn't have a no-JS or no-Flash fallback.
@@ -93,14 +93,14 @@ Drupal.media_vimeo.resizeEmbed = function () {
   var hw = Drupal.settings.media_vimeo[$(this).attr('id')].hw;
   // Change the height of the wrapper that was given a fixed height by the
   // Vimeo theming function.
-  $(this)
+  /*$(this)
     .height(context.width() * hw)
-    .width(context.width());
+    .width(context.width());*/
 
   // Change the attributes on the embed to match the new size.
-  video
+  /*video
     .height(context.width() * hw)
-    .width(context.width());
+    .width(context.width());*/
 };
 
 })(jQuery);

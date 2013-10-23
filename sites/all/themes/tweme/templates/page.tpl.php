@@ -11,14 +11,17 @@
 <div id="navbar" class="navbar navbar-medium navbar-inverse navbar-static-top">
 	<div class="navbar-inner">
 		<div class="container">
+                        <?php if ($navbar_menu): ?>
+			<nav class="nav-collapse collapse" role="navigation">
+        <?php print $navbar_menu ?>
+			<?php endif ?>
       <?php print $navbar_toggler ?>
 			<?php print $navbar_brand ?>
       <?php print $navbar_search ?>
-      <?php if ($navbar_menu): ?>
-			<nav class="nav-collapse collapse" role="navigation">
-        <?php print $navbar_menu ?>
-      </nav>
-			<?php endif ?>
+        </nav>
+                    <div id="header-top">
+                        <?php print render($page['header_top']); ?>
+                    </div>
 		</div>
 	</div>
 </div>

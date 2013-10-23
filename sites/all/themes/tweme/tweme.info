@@ -15,10 +15,13 @@ stylesheets[all][] = assets/css/bootstrap-extra.css
 stylesheets[all][] = assets/css/drupal.css
 stylesheets[all][] = assets/css/style.css
 stylesheets[all][] = assets/css/icubestyle.css
+stylesheets[all][] = assets/css/global.css
 
 scripts[] = assets/js/drupal.js
+scripts[] = assets/js/custom.js
 
 regions[header] = Header
+regions[header_top] = Header Top
 regions[help] = Help
 regions[body_top] = Body top
 regions[body_bottom] = Body bottom

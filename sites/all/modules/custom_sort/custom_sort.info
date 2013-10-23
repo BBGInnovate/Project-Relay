@@ -1,0 +1,4 @@
+name = "Custom Sort"
+description = "Custom sort for views slideshow"
+core = "7.x"
+version = "7.x-dev"

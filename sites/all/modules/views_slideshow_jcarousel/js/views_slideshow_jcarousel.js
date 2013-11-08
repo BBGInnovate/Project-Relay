@@ -26,7 +26,7 @@ Drupal.behaviors.viewsSlideshowJcarouselPager = {
       });
 
       $(this).find('.views_slideshow_jcarousel_pager_item').each(function(index, pagerItem) {
-        $(pagerItem).click(function() {
+		$(pagerItem).click(function() {
           Drupal.viewsSlideshow.action({ "action": 'goToSlide', "slideshowID": uniqueID, "slideNum": index });
         });
       });
@@ -65,7 +65,7 @@ Drupal.viewsSlideshowJcarouselPager.previousSlide = function (options) {
   for(pagerLocation in Drupal.settings.viewsSlideshowPager[options.slideshowID]) {
     // Get the current active pager.
     var pagerNum = $('[id^="views_slideshow_jcarousel_pager_item_' + pagerLocation + '_'  + options.slideshowID + '"].active').attr('id').replace('views_slideshow_pager_field_item_' + pagerLocation + '_'  + options.slideshowID + '_', '');
-
+	
     // If we are on the first pager then activate the last pager.
     // Otherwise activate the previous pager.
     if (pagerNum == 0) {
@@ -74,6 +74,8 @@ Drupal.viewsSlideshowJcarouselPager.previousSlide = function (options) {
     else {
       pagerNum--;
     }
+
+ $('.views_slideshow_jcarousel_pager_item:eq('+pagerNum+')').addClass('views_slideshow_active_pager_field_item').siblings().removeClass('views_slideshow_active_pager_field_item');
 
     if (Drupal.settings.viewsSlideshowJCarouselPager[options.slideshowID][pagerLocation].moveOnChange) {
       Drupal.settings.viewsSlideshowJCarouselPager[options.slideshowID][pagerLocation].scroll(pagerNum);

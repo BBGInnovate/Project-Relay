@@ -37,3 +37,26 @@ $msg = "<div id='disqus_thread'></div>
     return $output;
   }
 }
+function custom_module_mail($key, &$message, $params) {
+  switch($key) {
+  case 'article':
+  $node_id=$params['created_node'];
+  $node=node_load($node_id);
+  $langcode = $message['language']->language;
+  $message['subject'] = 'Please resend your Beacon card request';
+  $body_top = 'Hi, <br/>  the email you sent in to create a card on Beacon does not contain the information needed to create the type of card you intended to publish.<br/>'. 'The contents of your email was as follows:<br /> Subject:'.$node->field_email_subject['und']['0']['value'].'<br/>Body:'.$node->field_email_body['und']['0']['value'].'<br />';
+  $body_help = 'Please see below for the correct format for each type.<br />';
+  $body_article = '<b><u>Article</u></b><br/><b>Subject:</b> article #eventcontenttag<br/><b>Body:</b><br/>headline<br/>article author name<br/>read more url<br/>article intro text<br/>';
+  $body_editor = '<b><u>Editor Message</u></b><br/><b>Subject:</b>editor message #eventcontenttag<br/><b>Body:</b><br/>Editor Message text<br/>';
+  $body_tweet = '<b><u>Featured Tweet</u></b><br/><b>Subject:</b>tweet #eventcontenttag<br/><b>Body:</b><br/>tweet embed code<br/>';
+  $message['body'][] =$body_top.$body_help.$body_article.$body_editor.$body_tweet;
+  break;
+case 'notice_housing_student':
+  $node_email = node_load(94);
+  $langcode = $message['language']->language;
+  $message['subject'] = $node_email->title;
+  $message['body'][] =$node_email->body['und'][0]['value'];
+  $message['params']['attachments'][] = $attachment;
+  break;
+  }
+}

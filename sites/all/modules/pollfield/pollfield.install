@@ -23,46 +23,17 @@
  */
 function pollfield_field_schema($field) {
   $columns = array(
-    'question' => array(
-      'type' => 'text',
-      'size' => 'medium',
-      'not null' => FALSE,
-    ),
-    'choice' => array(
-      'type' => 'text',
-      'size' => 'medium',
-      'not null' => FALSE,
-    ),
-    'anonymous' => array(
-      'type' => 'text',
-      'size' => 'small',
-      'not null' => FALSE,
-    ),
-    'poll_features' => array(
-      'type' => 'text',
-      'size' => 'medium',
-      'not null' => FALSE,
-    ),
-    'active' => array(
-      'type' => 'int',
-      'unsigned' => TRUE,
-      'not null' => FALSE,
-      'default' => 0,
-    ),
-    'runtime' => array(
-      'type' => 'int',
-      'unsigned' => TRUE,
-      'not null' => FALSE,
-      'default' => 0,
-    ),
-    'votes' => array(
-      'type' => 'int',
-      'unsigned' => TRUE,
-      'not null' => FALSE,
-      'default' => 0,
-    ),
+    'question' => array('type' => 'text', 'size' => 'medium', 'not null' => FALSE),
+    'choice' => array('type' => 'text', 'size' => 'medium', 'not null' => FALSE),
+    'anonymous'=> array('type' => 'text', 'size' => 'small', 'not null' => FALSE),
+    'poll_features'=>array('type' => 'text', 'size' => 'medium', 'not null' => FALSE),
+    'active' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE, 'default' => 0),
+    'runtime'=> array('type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE, 'default' => 0),
+    'votes'=> array('type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE, 'default' => 0),
   );
-  $indexes = array();
+  $indexes = array(
+    
+  );
   return array(
     'columns' => $columns,
     'indexes' => $indexes,
@@ -75,6 +46,8 @@ function pollfield_field_schema($field) {
  * @ingroup nodeapi_example
  */
 function pollfield_schema() {
+
+	
   $schema['pollfield'] = array(
     'description' => 'Inventory of all pollfields their basic settings',
     'fields' => array(
@@ -118,7 +91,7 @@ function pollfield_schema() {
       'field_table' => array('field_table'),
     ),
   );
-
+	
   $schema['pollfield_votes'] = array(
     'description' => 'Pollfield results table',
     'fields' => array(
@@ -163,24 +136,24 @@ function pollfield_schema() {
         'default' => '',
       ),
 
-      'field_name_delta' => array(
+    'field_name_delta' => array(
         'description' => 'Pollfield delta',
         'type' => 'int',
         'unsigned' => 1,
         'not null' => TRUE,
         'default' => 0,
       ),
-      'weight' => array(
+    'weight' => array(
         'description' => 'Weight for mulitchoice',
         'type' => 'int',
         'unsigned' => 1,
         'not null' => TRUE,
         'default' => 0,
       ),
-      'cookie' => array(
+    'cookie' => array(
         'description' => 'Cookie for anonymous voters',
         'type' => 'varchar',
-        'length' => 255,
+        'length' => 128,
         'not null' => TRUE,
         'default' => '',
       ),
@@ -194,19 +167,6 @@ function pollfield_schema() {
   );
 
   return $schema;
-}
-
-/**
- * Changes size of {pollfield_votes}.cookie column.
- */
-function pollfield_update_7001() {
-  db_change_field('pollfield_votes', 'cookie', 'cookie', array(
-    'description' => 'Cookie for anonymous voters',
-    'type' => 'varchar',
-    'length' => 255,
-    'not null' => TRUE,
-    'default' => '',
-  ));
 }
 
 /**

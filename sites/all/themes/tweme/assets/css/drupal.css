@@ -69,7 +69,9 @@ body.front td, body.front td.active {
 .node .content h6 {
   padding-top: 20px;
 }
-
+.node-unpublished {
+	background: #404040 !important;
+}
 
 /* Poll */
 

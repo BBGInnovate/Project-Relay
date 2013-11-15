@@ -10,6 +10,8 @@ $(document).ready(function() {
 
 //Add Nicescroll script - TEMPORARY
 $('head').append('<script src="/sites/all/themes/tweme/assets/js/jquery.nicescroll.min.js"></script>');
+$('head').append('<script src="/sites/all/themes/tweme/assets/js/jquery.touchwipe.1.1.1.js"></script>');
+
 //$('meta[name="viewport"]').attr('content', 'width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1');
 
 function deviceWidth() { 
@@ -71,11 +73,28 @@ $.fn.responsiveVideo = function() {
 
 $('body').responsiveVideo();
 
-
+//remove comments
 function removeComments() {
 	$('#disqus_thread').remove();
 	$('.nav-tabs li:first-child, .info-pane').addClass('active').siblings().removeClass('active');
 }
+
+//Add swipe funtionality to main slider
+$("#views_slideshow_cycle_main_event_card-block_1").touchwipe({
+     wipeLeft: function() { 
+	 	removeComments();
+		$('#views_slideshow_cycle_main_event_card-block_1').cycle('next');
+	  },
+     wipeRight: function() { 
+	 	removeComments();
+		$('#views_slideshow_cycle_main_event_card-block_1').cycle('prev');
+	 },
+  //   wipeUp: function() { alert("up"); },
+    // wipeDown: function() { alert("down"); },
+     min_move_x: 20,
+     min_move_y: 20,
+     preventDefaultEvents: true
+});
 
 
 //jCarousel Pager - Add active class when item in horizontal nav item is clicked
@@ -204,7 +223,8 @@ if(!mobileCheck()) {
 		  cursorcolor: '#222222',
 		  cursorwidth: 6,
 		  cursorborder: 'none',
-		  horizrailenabled: false
+		  horizrailenabled: false,
+		  cursorfixedheight: '20px'
 	});
 
 	$('.load_comments').click(function(){
@@ -226,11 +246,8 @@ if(!mobileCheck()) {
 		});
 		
 		$('html').css('overflow', 'hidden');
-	}
-	
+	}	
 }
-
 
 });
 })(jQuery);
-

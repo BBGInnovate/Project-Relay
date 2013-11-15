@@ -1,0 +1,11 @@
+name = Profile2 Privacy
+description = Create sets of fields within privacy levels that users can select.
+dependencies[] = profile2
+core = 7.x
+
+; Information added by drupal.org packaging script on 2013-10-25
+version = "7.x-1.4"
+core = "7.x"
+project = "profile2_privacy"
+datestamp = "1382662833"
+

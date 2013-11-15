@@ -308,10 +308,7 @@ p{
 	text-decoration: none;
 }
 #disqus_thread {
-   /* max-height: 250px;*/
-   /* overflow-y: auto;*/
     padding: 10px 20px 0 0;
-    /*width: 77%;*/
 }
 .comments-pane {
     height: 300px;
@@ -788,8 +785,6 @@ body.node-type-event #header{
 #current-card-wrapper {
 	display:none;
 }
-
-
 .closed-menu {
 	overflow: auto !important;
 	z-index: 9999 !important;
@@ -864,7 +859,7 @@ td p{margin: 0 !important;}
 }
 .card-article, .card-ftweet, .card-producermessage {
     padding-left:8%;
-	padding-right:8%;
+    padding-right:8%;
 }
 .card-audio .tab-content {
     padding-left: 20px;

@@ -1,0 +1,131 @@
+<?php
+/**
+ * @file youtube_pull.module
+ * Based on codes from http://www.ibm.com/developerworks/xml/library/x-youtubeapi/
+ */
+
+define ('YOUTUBE_PULL_ITEMS', 5);
+// set video data feed URL
+define ('FEED_URL', 'http://gdata.youtube.com/feeds/api/videos');
+
+/**
+ * Implements hook_theme().
+ * Simple theme template that can be applied to video feed.
+ */
+function youtube_pull_theme() {
+  return array(
+    'youtube_pull_listing' => array(
+      'variables' => array('videos' => NULL),
+      'template' => 'youtube-pull-listing',
+    ),
+  );
+}
+
+/**
+ * Retrieves YouTube video feed query.
+ * @TODO: more info in the $options
+ */
+function youtube_pull_render($options = NULL) {
+  $query = '';
+  $videos = array();
+
+  // merge in defaults.
+  $options += array(
+    'keywords' => '',
+    'max-results' => YOUTUBE_PULL_ITEMS,
+  );
+
+  $feedURL = FEED_URL;
+
+  // append the query.
+  if ($options) {
+    $feedURL .= (strpos($feedURL, '?') !== FALSE ? '&' : '?') . drupal_http_build_query($options);
+  }
+  // read feed into SimpleXML object
+  $sxml = simplexml_load_file($feedURL);
+
+  // iterate over entries in resultset
+  foreach ($sxml->entry as $entry) {
+    // parse video entry
+    $videos[] = youtube_pull_parse_entry($entry);
+  }
+
+  // call template for video feed output
+  $output = theme('youtube_pull_listing', array('videos' => $videos));
+
+  return $output;
+}
+
+/**
+ * Function to parse a video <entry>
+ */
+function youtube_pull_parse_entry($entry) {
+  $obj = new stdClass();
+
+  // get nodes in media: namespace for media information
+  $media = $entry->children('http://search.yahoo.com/mrss/');
+  $obj->title = $media->group->title;
+  $obj->description = $media->group->description;
+
+  // get video player URL
+  $attrs = $media->group->player->attributes();
+  $obj->watchURL = $attrs['url'];
+
+  // get video thumbnails
+  $attrs = $media->group->thumbnail[0]->attributes();
+  $obj->thumbnailFull = $attrs['url'];
+  $thumbnail = $attrs['url'];
+  $thumbnail = substr($thumbnail, 0,-5);
+  $obj->thumbnailDefault = $thumbnail . 'default.jpg';
+  $obj->thumbnailMQ = $thumbnail . 'mqdefault.jpg';
+  $obj->thumbnailHQ = $thumbnail . 'hqdefault.jpg';
+  $obj->thumbnailStart = $thumbnail . '1.jpg';
+  $obj->thumbnailMiddle = $thumbnail . '2.jpg';
+  $obj->thumbnailEnd = $thumbnail . '3.jpg';
+
+  // get <yt:duration> node for video length
+  $yt = $media->children('http://gdata.youtube.com/schemas/2007');
+  $attrs = $yt->duration->attributes();
+  $obj->length = $attrs['seconds'];
+
+  // get <yt:stats> node for viewer statistics
+  $yt = $entry->children('http://gdata.youtube.com/schemas/2007');
+  $attrs = $yt->statistics->attributes();
+  $obj->viewCount = intval($attrs['viewCount']);
+
+  // get <gd:rating> node for video ratings
+  $gd = $entry->children('http://schemas.google.com/g/2005');
+  if ($gd->rating) {
+    $attrs = $gd->rating->attributes();
+    $obj->rating = floatval($attrs['average']);
+  } else {
+    $obj->rating = 0;
+  }
+
+  // get <gd:comments> node for video comments
+  $gd = $entry->children('http://schemas.google.com/g/2005');
+  if ($gd->comments->feedLink) {
+    $attrs = $gd->comments->feedLink->attributes();
+    $obj->commentsURL = $attrs['href'];
+    $obj->commentsCount = $attrs['countHint'];
+  }
+
+  // get feed URL for video responses
+  $entry->registerXPathNamespace('feed', 'http://www.w3.org/2005/Atom');
+  $nodeset = $entry->xpath("feed:link[@rel='http://gdata.youtube.com/schemas/
+  2007#video.responses']");
+  if (count($nodeset) > 0) {
+    $obj->responsesURL = $nodeset[0]['href'];
+  }
+
+  // get feed URL for related videos
+  $entry->registerXPathNamespace('feed', 'http://www.w3.org/2005/Atom');
+  $nodeset = $entry->xpath("feed:link[@rel='http://gdata.youtube.com/schemas/
+  2007#video.related']");
+  if (count($nodeset) > 0) {
+    $obj->relatedURL = $nodeset[0]['href'];
+  }
+
+  // return object to caller
+  return $obj;
+}

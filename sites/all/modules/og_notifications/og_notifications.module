@@ -1,0 +1,217 @@
+<?php
+
+/*
+ * Implements of the hook_menu()
+ */
+function og_notifications_menu() {
+  $items['admin/config/messaging/subscriptions/organic_groups'] = array(
+    'title' => 'Organic Groups',
+    'description' => 'Organic Groups subscriptions',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('og_notifications_settings_form'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'og_notifications.admin.inc',
+  );
+  $items['group_label/autocomplete'] = array(
+    'title' => 'Autocomplete group',
+    'page callback' => 'og_notifications_autocomplete',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Check access to user account tab
+ */
+function og_notifications_account_access($account, $type) {
+  return module_exists('notifications_account') && notifications_account_tab_access($account, $type);
+}
+
+/**
+ * Implements hook_permission()
+ */
+function og_notifications_permission() {
+  return array(
+    'subscribe to a group' => array(
+      'title' => t('Subscribe to content in a group.'),
+      'description' => t('Subscribe to content posted in a group.'),
+    ),
+    'subscribe to content type in a group' => array(
+      'title' => t('Subscribe to content type in a group.'),
+      'description' => t('Subscribe to content by type posted in a group.'),
+    ),
+  );
+}
+
+/**
+ * Implements of hook_notifications()
+ */
+function og_notifications_notifications($op) {
+  switch ($op) {
+    case 'subscription types':
+      $types['group_content'] = array(
+        'title' => t('All content in group'),
+        'class' => 'Og_Notifications_Subscription',
+        'field_types' => array('node:gid'),
+        'object_types' => array('node', 'group'),
+        'access' => array('subscribe to a group'),
+        'description' => t('Subscribe to all content submitted to a group.'),
+        'display_options' => array('node_links', 'teaser_links')
+      );
+      $types['group_content_type'] = array(
+        'title' => t('Content type in group'),
+        'class' => 'Og_Notifications_Subscription',
+        'field_types' => array('node:gid', 'node:type'),
+        'object_types' => array('node', 'node_type'),
+        'access' => array('subscribe to content type in a group'),
+        'description' => t('Subscribe to all content of a given type in the current group.'),
+        'display_options' => array('node_links', 'teaser_links')
+      );
+      return $types;
+
+    case 'field types':
+      $fields['node:gid'] = array(
+        'title' => t('Group'),
+        'class' => 'Og_Notifications_Field',
+      );
+      return $fields;
+  }
+}
+
+/*
+ * Get group ID by group label.
+ */
+function _og_notifications_get_gid_by_lable($name) {
+  $query = db_select('field_data_group_group', 'og');
+  $query->join('node', 'n', 'n.nid = og.entity_id');
+  $query->fields('n', array('nid', 'title'));
+  $query->condition('n.title', $name);
+  $result = $query->execute()->fetchAll();
+  if (!empty($result)) {
+    return $result[0]->nid;
+  }
+  else {
+    return;
+  }
+}
+
+/**
+ * Implements of hook notifications_subscription()
+ */
+function og_notifications_notifications_subscription($op, $subscription = NULL) {
+  switch ($op) {
+    case 'page objects':
+      $objects = array();
+      // Return objects on current page to which we can subscribe
+      if (arg(0) == 'node' && is_numeric(arg(1)) && ($node = menu_get_object('node'))) {
+        $objects[] = notifications_object('group', $node);
+      }
+      return $objects;
+      break;
+  }
+}
+
+/**
+ * Implements of hook_notifications_object_node()
+ */
+function og_notifications_notifications_object_node($op, $node, $account = NULL) {
+  switch ($op) {
+    case 'subscription types':
+      return array('group_content', 'group_content_type');
+    case 'subscriptions':
+      // Return available subscription options for this node
+      $options = array();
+      if (array_keys(og_get_all_group_content_entity())) {
+        $options[] = notifications_subscription('group_content')
+          ->add_field('node:gid', $node)
+          ->set_group($node)
+          ->set_name(t('All posts in this group.'));
+      }
+      if (notifications_content_type_enabled($node->type, 'group_content_type')) {
+        $options[] = Notifications_Subscription::build_instance('group_content_type')
+          ->add_field('node:gid', $node)
+          ->add_field('node:type', $node->type)
+          ->set_group($node)
+          ->set_name(t('Posts of type @type in the current group.', array('@type' => node_type_get_name($node))));
+      }
+      return $options;
+      break;
+  }
+}
+
+/**
+ * Menu callback for the autocomplete results.
+ */
+function og_notifications_autocomplete($string = '') {
+  $matches = array();
+  $allowed_node_types = array();
+  $allowed_groups = variable_get('og_notifications', array());
+
+  foreach ($allowed_groups as $node_type => $available) {
+    if ($available !== 0) {
+      $allowed_node_types[] = $node_type;
+    }
+  }
+
+  $query = db_select('field_data_group_group', 'og');
+  $query->join('node', 'n', 'n.nid = og.entity_id');
+  $query->fields('n', array('nid', 'title'));
+  $query->condition('og.entity_type', 'node');
+  $query->condition('n.type', $allowed_node_types, 'IN');
+  $query->condition('n.title', '%' . db_like($string) . '%', 'LIKE');
+  $groups = $query->execute()->fetchAllKeyed();
+  foreach ($groups as $gid => $label) {
+    // Add a class wrapper for a few required CSS overrides.
+    $matches[$label] = '<div class="group-autocomplete">' . $label . '</div>';
+  }
+  drupal_json_output($matches);
+}
+
+/**
+ *  Return the group node types.
+ */
+function _og_notifications_get_group_types() {
+  $group_types = array();
+  foreach ($node_types = node_type_get_types() as $type => $type_object) {
+    if (og_get_group_type('node', $type)) {
+      $group_types[$type] = $type_object->name;
+    }
+  }
+  return $group_types;
+}
+
+/**
+ *  Adds custom validation, which will check entered group name.
+ */
+function og_notifications_form_notifications_subscription_form_alter(&$form, &$form_state, $form_id) {
+  $form['#validate'][] = 'og_notifications_subscription_form_validate';
+}
+
+/**
+ *  Validation, which will check entered group name and it's node type.
+ */
+function og_notifications_subscription_form_validate($form, &$form_state) {
+  if (isset($form_state['values']['subscription_fields'])) {
+    $allowed_node_types = array();
+    $allowed_groups = variable_get('og_notifications', array());
+
+    foreach ($allowed_groups as $node_type => $available) {
+      if ($available !== 0) {
+        $allowed_node_types[] = $node_type;
+      }
+    }
+
+    $query = db_select('field_data_group_group', 'og');
+    $query->join('node', 'n', 'n.nid = og.entity_id');
+    $query->fields('n', array('nid', 'title'));
+    $query->condition('og.entity_type', 'node');
+    $query->condition('n.type', $allowed_node_types, 'IN');
+    $query->condition('n.title', $form_state['values']['subscription_fields'][0]);
+
+    if (!$query->execute()->fetchAllKeyed()) {
+      form_set_error('subscription_fields', t('Select existing group.'));
+    }
+  }
+}

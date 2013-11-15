@@ -1,0 +1,247 @@
+<?php
+/**
+ * @file
+ * Allows restricting access to menu items per role
+ */
+
+
+/**
+ * Implements hook_permission().
+ */
+function menu_per_role_permission() {
+  $permissions = array();
+
+  $permissions['administer menu_per_role'] = array(
+    'title' => t("Administer menu per role"),
+    'description' => t("Permission for who can access the menu per role forms."),
+  );
+
+  return $permissions;
+}
+
+/**
+ * Implementation of hook_menu_link_alter()
+ */
+function menu_per_role_form_menu_edit_item_alter(&$link) {
+  if (!user_access('administer menu_per_role')) {
+    return;
+  }
+
+  $default_value_roles = $link['mlid']['#value'] ? _menu_per_role_get_roles($link['mlid']['#value'], 0) : array();
+  $default_value_hide_from_roles = $link['mlid']['#value'] ? _menu_per_role_get_roles($link['mlid']['#value'], 1) : array();
+
+  $link['menu_per_role'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Restrict item visibility'),
+    '#collapsible' => TRUE,
+    '#collapsed' => (count($default_value_roles) + count($default_value_hide_from_roles)) == 0,
+    '#weight' => 5,
+    '#description' => t('Check to know whether the user has proper visibility permissions to see this menu item. Note that both checks are always performed.'),
+    '#tree' => TRUE,
+  );
+
+  $link['menu_per_role']['menu_per_role_roles'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Show menu item only to selected roles'),
+    '#options' => user_roles(),
+    '#default_value' => $default_value_roles,
+    '#description' => t('Check no role to leave the access permission to the default. A user who is not part of at least one of the selected roles will not see this menu item.'),
+  );
+
+  $link['menu_per_role']['menu_per_role_hide_from_roles'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Hide menu item from selected roles'),
+    '#options' => user_roles(),
+    '#default_value' => $default_value_hide_from_roles,
+    '#description' => t('Check no role to leave the access permission to the default. A user who is part of any one of these roles will not see this menu item.'),
+  );
+}
+
+/**
+ * Implements hook_menu_link_insert()
+ */
+function menu_per_role_menu_link_insert($link) {
+  if (isset($link['menu_per_role']) && user_access('administer menu_per_role')) {
+    // hide but to those roles
+    $rids_str = _menu_per_role_serialize_rids($link['menu_per_role']['menu_per_role_roles']);
+
+    // show but to those roles
+    $hrids_str = _menu_per_role_serialize_rids($link['menu_per_role']['menu_per_role_hide_from_roles']);
+
+    $fields = array('rids' => $rids_str, 'hrids' => $hrids_str, 'mlid' => $link['mlid']);
+    drupal_write_record('menu_per_role', $fields);
+    /*
+    db_insert('menu_per_role')->fields($fields)->execute();
+    */
+  }
+}
+
+/**
+ * Implements hook_menu_link_update()
+ */
+function menu_per_role_menu_link_update($link) {
+  if (isset($link['menu_per_role']) && user_access('administer menu_per_role')) {
+    // hide but to those roles
+    $rids_str = _menu_per_role_serialize_rids($link['menu_per_role']['menu_per_role_roles']);
+
+    // show but to those roles
+    $hrids_str = _menu_per_role_serialize_rids($link['menu_per_role']['menu_per_role_hide_from_roles']);
+
+    $fields = array('rids' => $rids_str, 'hrids' => $hrids_str);
+    if (db_query('SELECT mlid FROM {menu_per_role} WHERE mlid = :mlid', array(':mlid' => $link['mlid']))->rowCount() == 0){
+      $fields['mlid'] = $link['mlid'];
+      db_insert('menu_per_role')->fields($fields)->execute();
+    }
+    else {
+      db_update('menu_per_role')->fields($fields)->condition('mlid', $link['mlid'])->execute();
+    }
+  }
+}
+
+/**
+ * Implements hook_menu_link_delete()
+ */
+function menu_per_role_menu_link_delete($link) {
+  // Delete the record from our table.
+  db_delete('menu_per_role')
+    ->condition('mlid', $link['mlid'])
+    ->execute();
+}
+
+/*
+ * When the menu item is being submitted, the core also calls the
+ * hook_menu_link_alter(&$item, $menu);
+ *
+ * By catching that function, we can set the special alter option
+ * that will let our module receive a call whenever the menu is
+ * ready for display but was not yet displayed. At that time we
+ * can mark the access as FALSE.
+ */
+function menu_per_role_menu_link_alter(&$item) {
+  // TODO: The following marks ALL menu items as alterable.
+  //       Any time a menu item is saved, it is marked as
+  //       such. I have no clue, at this time, of a way to
+  //       avoid such nonsense. Hints welcome!
+  
+  menu_per_role_menu_link_update($item);
+  
+  $item['options']['alter'] = TRUE;
+}
+
+/*
+ * Before a menu item gets displayed, the core calls the hook:
+ * hook_translated_menu_link_alter(&$item, $map);
+ * (but only if $item['options']['alter'] is TRUE)
+ *
+ * This function is used to alter the access right based on
+ * the role definition of the item.
+ */
+function menu_per_role_translated_menu_link_alter(&$item, $map) {
+  // avoid checking the role if the item access is already false
+  if ($item['access'] && _menu_per_role_access($item['mlid']) === FALSE) {
+    $item['access'] = FALSE;
+  }
+}
+
+/*
+ * Determines access for a give menu item id
+ *
+ * \param[in] $mlid The menu item identifier
+ *
+ * \return NULL if this module does not forbid the viewing of this menu item,
+ * FALSE otherwise
+ */
+function _menu_per_role_access($mlid) {
+  global $user;
+
+  if (empty($mlid)) {
+    return NULL;
+  }
+
+  // If menu is being edited allow user to see it in full
+  if (arg(0) == 'admin' && arg(1) == 'structure' && arg(2) == 'menu') {
+    return NULL;
+  }
+
+  // check whether this role has visibility access (must be present)
+  $rids = _menu_per_role_get_roles($mlid, 0);
+  if (!empty($rids) && count(array_intersect($rids, array_keys($user->roles))) == 0) {
+    // not permitted by the rids...
+    return FALSE;
+  }
+
+  // check whether this role has visibility access (must not be present)
+  $hrids = _menu_per_role_get_roles($mlid, 1);
+  if (!empty($hrids) && count(array_intersect($hrids, array_keys($user->roles))) > 0) {
+    // not permitted by the hrids...
+    return FALSE;
+  }
+
+  // this module is not preventing user from seeing this menu entry
+  return NULL;
+}
+
+/**
+ * Turn the given roles into a serialized string of rids or hrids.
+ * $roles is an array of roles as passed from the appropriate keys from $form_state['values'] during a form submit.
+ */
+function _menu_per_role_serialize_rids($roles){
+  $rids = array();
+
+  foreach ($roles as $rid => $checked) {
+    if ($checked) {
+      $rids[] = $rid;
+    }
+  }
+
+  return implode(',', $rids);
+}
+
+
+/**
+ * Turn a serialized string of rids or hrids into an array of rids or hrids.
+ * $rids is the serialized string to unserialize.
+ */
+function _menu_per_role_unserialize_rids($rids){
+  return explode(',', $rids);
+}
+
+/**
+ * Gets all roles with access to the specified menu item
+ * No roles mean that access is granted by this module.
+ *
+ * $show set to 0 for show to roles, 1 for hide from roles
+ */
+function _menu_per_role_get_roles($mlid, $show) {
+  static $menu_per_role;
+
+  if (!isset($menu_per_role)) {
+    // read all the data ONCE, it is likely very small
+    $menu_per_role = array();
+    $result = db_select('menu_per_role', 'mpr')->fields('mpr')->execute()->fetchAll();
+
+    foreach ($result as $row){
+      if ($row->rids || $row->hrids) {
+        if ($row->rids) {
+          $menu_per_role[$row->mlid][0] = _menu_per_role_unserialize_rids($row->rids);
+        }
+        else {
+          $menu_per_role[$row->mlid][0] = array();
+        }
+        if ($row->hrids) {
+          $menu_per_role[$row->mlid][1] = _menu_per_role_unserialize_rids($row->hrids);
+        }
+        else {
+          $menu_per_role[$row->mlid][1] = array();
+        }
+      }
+    }
+  }
+
+  if (isset($menu_per_role[$mlid])) {
+    return $menu_per_role[$mlid][$show];
+  }
+
+  // not defined, everyone has the right to use it
+  return array();
+}

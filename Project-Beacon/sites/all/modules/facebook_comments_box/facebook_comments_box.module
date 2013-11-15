@@ -1,0 +1,197 @@
+<?php
+
+/**
+ * @file
+ * Add Facebook Comments to selected content types on your site.
+ */
+
+
+/**
+ * Implements hook_menu().
+ */
+function facebook_comments_box_menu() {
+
+  // The main admin screen.
+  $items['admin/config/content/facebook_comments_box'] = array(
+    'title' => 'Facebook Comments Box',
+    'description' => 'Add Facebook Comments to selected content types on your site.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('facebook_comments_box_config'),
+    'type' => MENU_NORMAL_ITEM,
+    'access arguments' => array('administer facebook comments box'),
+  );
+
+  return $items;
+}
+
+
+/**
+ * Implements hook_block_info().
+ */
+function facebook_comments_box_block_info() {
+
+  $blocks['facebook_comments_box'] = array(
+    'info' => t('Facebook Comments Box'),
+  );
+
+  return $blocks;
+}
+
+
+/**
+ * Implements hook_block_view().
+ */
+function facebook_comments_box_block_view($delta = '') {
+
+
+  $block = array();
+  switch ($delta) {
+    case 'facebook_comments_box':
+
+      $fcb_title = '';
+      $node_type = '';
+
+      // Get which node types should have comments.
+      $fcb_node_types = variable_get('facebook_comments_box_default_node_types', array(NULL));
+
+      // Figure out which node and nodetype we're on, puts comments only on
+      // nodes (as opposed to the front page, views pages, term pages, etc.)
+      if (arg(0) == 'node' && is_numeric(arg(1))) {
+        $nid       = arg(1);
+        $node      = node_load($nid);
+        $node_type = $node->type;
+        $fcb_title = check_plain($node->title);
+      }
+
+      // If the nodetype is set and selected in config, then load the comments
+      // on the page.
+      if (isset($node_type) && in_array($node_type, $fcb_node_types) && $node->status) {
+
+        // Figure out the current absolute URL.
+        $path = isset($_GET['q']) ? $_GET['q'] : '<front>';
+        $fcb_url = url($path, array('absolute' => TRUE));
+
+        // Meta mark up for the page.
+        $markup = '<meta property="og:type" content="Article" />';
+        $markup .= '<meta property="og:title" content="' . $fcb_title . '"/>';
+        $markup .= '<meta property="og:url" content="' . $fcb_url . '"/>';
+        $markup .= '<meta property="og:image" content="' . theme_get_setting('logo') . '"/>';
+        $markup .= '<meta property="fb:admins" content="' . check_plain(variable_get('facebook_comments_box_admin_id', NULL)) . '">';
+
+        // Setup the array.
+        $metafcb = array(
+          '#type' => 'markup',
+          '#markup' => $markup,
+        );
+
+        // Add meta data to the HEAD.
+        drupal_add_html_head($metafcb, 'meta-fcb');
+
+        // Set the title of the block.
+        $block['subject'] = t('Facebook Comments Box');
+
+        // Set the content of the block.
+        $fcb_content = '<div class="facebook-comments-box">';
+        $fcb_content .= '<div id="fb-root"></div>';
+        $fcb_content .= '<script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>';
+        $fcb_content .= '<fb:comments href="' . $fcb_url . '" ';
+        $fcb_content .= ' num_posts="' . check_plain(variable_get('facebook_comments_box_default_comments', 10)) . '" ';
+        $fcb_content .= ' width="' . check_plain(variable_get('facebook_comments_box_default_width', 400)) . '" ';
+        $fcb_content .= ' colorscheme="' . variable_get('facebook_comments_box_default_theme', 'light') . '" ></fb:comments></div>';
+
+        $block['content'] = $fcb_content;
+      }
+      break;
+  }
+  return $block;
+}
+
+
+/**
+ * Main configuration screen.
+ */
+function facebook_comments_box_config($form, &$form_state) {
+
+  // Global settings for the whole module.
+  $form['facebook_comments_box_global'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Global Settings'),
+    '#collapsible' => TRUE,
+  );
+
+  $form['facebook_comments_box_global']['facebook_comments_box_admin_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Facebook Admin ID'),
+    '#default_value' => variable_get('facebook_comments_box_admin_id', NULL),
+    '#description' => t('Your Facebook Admin Username, ID or App ID. More than one admin can be separated by commas.'),
+    '#required' => TRUE,
+  );
+
+
+  // Default settings for each block gets that you can configure and change by
+  // block // (the first version of this gets one global setting for all node
+  // types).
+  $form['facebook_comments_box_default_block'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Default Block Settings'),
+    '#collapsible' => TRUE,
+  );
+
+  $form['facebook_comments_box_default_block']['facebook_comments_box_default_comments'] = array(
+    '#type' => 'select',
+    '#title' => t('Default Number of Comments'),
+    '#default_value' => variable_get('facebook_comments_box_default_comments', 10),
+    '#options' => array(
+      10 => 10,
+      20 => 20,
+      30 => 30,
+      50 => 50,
+      100 => 100,
+    ),
+    '#description' => t('The number of comments to show by default on the page displaying them.'),
+    '#required' => TRUE,
+  );
+
+
+  $form['facebook_comments_box_default_block']['facebook_comments_box_default_width'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Default Width of Comments (in pixels)'),
+    '#default_value' => variable_get('facebook_comments_box_default_width', 400),
+    '#size' => 4,
+    '#maxlength' => 4,
+    '#description' => t('The width of the comments with a minimum of 400px.'),
+    '#required' => TRUE,
+  );
+
+  $form['facebook_comments_box_default_block']['facebook_comments_box_default_theme'] = array(
+    '#type' => 'select',
+    '#title' => t('Default Theme'),
+    '#default_value' => variable_get('facebook_comments_box_default_theme', 'light'),
+    '#options' => array(
+      'light' => t('Light'),
+      'dark' => t('Dark'),
+    ),
+    '#description' => t('The default theme to use for comments.'),
+    '#required' => TRUE,
+  );
+
+
+  // Store the node type keys as values for easier comparison.
+  $fcb_all_node_types_keys = array_keys(node_type_get_types());
+  $fcb_all_node_types = array();
+  foreach ($fcb_all_node_types_keys as $node_type) {
+    $fcb_all_node_types[$node_type] = $node_type;
+  }
+
+  $form['facebook_comments_box_default_block']['facebook_comments_box_default_node_types'] = array(
+    '#type' => 'select',
+    '#title' => t('Default Node Types'),
+    '#default_value' => variable_get('facebook_comments_box_default_node_types', NULL),
+    '#options' => $fcb_all_node_types,
+    '#multiple' => TRUE,
+    '#description' => t('The node types to attach comments to. This will make comments available for each of the selected node types.'),
+    '#required' => TRUE,
+  );
+
+  return system_settings_form($form);
+}

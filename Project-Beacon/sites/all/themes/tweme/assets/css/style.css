@@ -1,0 +1,98 @@
+#featured {
+  background-color: whitesmoke;
+  border-bottom: 1px solid #e5e5e5;
+}
+#featured p u {
+  text-decoration: none;
+  border-bottom: 2px solid grey;
+}
+#featured p u a {
+  text-decoration: none;
+}
+#carousel {
+  height: 300px;
+  margin-bottom: 0;
+}
+#carousel .item {
+  height: 240px;
+  padding: 60px 10% 0 10%;
+  text-align: center;
+  width: 80%;
+}
+#carousel .item h1 {
+  font-size: 60px;
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: -1px;  
+  margin-bottom: 20px;
+}
+#carousel .item p {
+  font-size: 24px;
+  font-weight: 200;
+  line-height: 1.25;
+  margin-bottom: 20px;
+}
+#carousel .carousel-control {
+  background-color: transparent;
+  border: 0;
+  color: #333;
+  font-size: 100px;
+  line-height: 100px;
+  top: 50%;
+  height: 100px;
+  margin-top: -50px;
+}
+#header {
+  background-color: whitesmoke;
+  border-bottom: 1px solid #e5e5e5;
+  padding-top: 20px;
+}
+#main {
+  padding: 30px 0;
+}
+#main .block {
+  margin-bottom: 30px;
+}
+#sidebar-first > .region {
+  padding-right: 10px;
+}
+#sidebar-second > .region {
+  padding-left: 10px;
+}
+.sidebar input.form-text {
+  width: 70%;
+}
+#footer {
+  background-color: whitesmoke;
+  border-top: 1px solid #e5e5e5;
+  padding-bottom: 30px;
+  padding-top: 30px;
+}
+.footer-links a {
+  margin-left: 15px;
+}
+.block > h2 {
+  text-transform: uppercase;
+  color: #999;
+  font-size: 1.4em;
+  font-weight: normal;
+}
+
+
+/* Tags */
+
+.field-tags {
+  margin: 2em 0 2em 0;
+}
+.field-tags a.badge {
+  background: #08c;
+  border: 1px solid #08c;
+  margin-bottom: .4em;
+}
+.field-tags a.badge:not(:hover) {
+  background: snow;
+  border: 1px solid #ddd;
+  border-bottom-color: #bbb;
+  color: grey;
+  text-shadow: none;
+}

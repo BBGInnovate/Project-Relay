@@ -1,0 +1,207 @@
+/* deafult dynamic display block */
+div.block-ddblock .ddblock-container {
+  clear:both;
+  position: relative;
+}
+
+div.block-ddblock div.slider.overflow-visible{
+  overflow:visible!important;
+}
+/* default dynamic display block number pager */
+div.block-ddblock .ddblock-number-pager a.activeSlide  {
+  background: #88f;
+}
+div.block-ddblock .ddblock-number-pager a:focus {
+  outline: none;
+}
+div.block-ddblock .ddblock-number-pager  {
+/*  padding-bottom: 3px;     /* margin between bottom of pager and content */
+  position: relative;
+  left: 0;
+  display: block;
+}
+div.block-ddblock .ddblock-number-pager a {
+  margin: 0 2px 2px 0;      /* margin right and bottom between pagers */
+  padding: 0px 6px;         /* pading left and right inside pager */
+  border: 1px solid #ccc;
+  background: #fc0;
+  text-decoration: none;
+  display: block;
+  float: left;
+  font-size:.9em;          /* adjust fontsize */
+}
+div.block-ddblock .ddblock-number-pager {
+  display:block;
+  position:relative;
+}
+div.block-ddblock .ddblock-number-pager ul {
+  list-style-type:none;
+  margin:0!important;
+  padding:0!important;
+}
+div.block-ddblock .ddblock-number-pager ul li {
+  background:#fff!important;
+  display:inline;
+  list-style-type:none!important;
+  margin:0!important;
+  padding:0!important;
+}
+div.block-ddblock .ddblock-number-pager ul li a.pager-link{
+  background:#fc0;
+  border:1px solid #ccc;
+  display:block;
+  float:left;
+  font-family:Tahoma,Arial,sans-serif;
+  font-size:.7em;
+  font-weight:bold;
+  height:15px;
+  line-height:15px;
+  margin:0 2px 0 0;
+  text-align:center;
+  text-decoration:none!important;
+  width:15px;
+}
+div.block-ddblock .ddblock-number-pager ul li a.activeSlide{
+  background:#999;
+  color:#fff!important;
+}
+div.block-ddblock .ddblock-number-pager ul li a:focus{
+  outline:none;
+}
+div.block-ddblock .ddblock-number-pager ul li a.pager-link:hover{
+  background:#999;
+  color:#fff!important;
+}
+div.block-ddblock .ddblock-number-pager ul li a.prev,
+div.block-ddblock .ddblock-number-pager ul li a.next{
+  background:#fc0;
+  border:1px solid #ccc;
+  display:block;
+  float:left;
+  font-family:Tahoma,Arial,sans-serif;
+  font-size:.8em;
+  font-weight:bold;
+  height:15px;
+  line-height:15px;
+  margin:0 2px 0 0;
+  text-align:center;
+  text-decoration:none!important;
+  width:30px;
+}
+
+/* default dynamic display block prev-next pager */
+div.block-ddblock .ddblock-prev-next-pager a.activeSlide  {
+  background: #88f;
+}
+div.block-ddblock .ddblock-prev-next-pager a:focus {
+  outline: none;
+}
+div.block-ddblock .ddblock-prev-next-pager  {
+/*  padding-bottom: 3px;     /* margin between bottom of pager and content */
+  position: relative;
+  left: 0;
+  display: block;
+}
+div.block-ddblock .ddblock-prev-next-pager a {
+  background: #fc0;
+  border: 1px solid #ccc;
+  display: block;
+  float: left;
+  font-size:.9em;          /* adjust fontsize */
+  height:15px;
+  line-height:15px;
+  margin: 0 2px 2px 0;      /* margin right and bottom between pagers */
+  padding: 0px 6px;         /* pading left and right inside pager */
+  text-decoration: none;
+  width:30px;
+}
+
+/* default dynamic display block image pager */
+div.block-ddblock .ddblock-image-pager a.activeSlide  {
+  background: #ddd;
+}
+div.block-ddblock .ddblock-image-pager a:focus {
+  outline: none;
+}
+div.block-ddblock ul.ddblock-image-pager {
+  margin: 0 0 3px 0;
+  padding: 0;
+  line-height:1em;
+}
+div.block-ddblock .ddblock-image-pager li {
+/* width: 61px;         /*width of list item 55 from picture width + 2 X 3px padding*/
+  float: left;
+  margin: 0 3px 3px 0; /* margin right and bottom between pagers */
+  padding: 0;
+  list-style: none;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+div.block-ddblock .ddblock-image-pager li a {
+/*  width: 55px;         /* width of list item*/
+/*  height: 55px;        /*height of list item*/
+  padding: 3px;
+  display: block;
+  background: #fff;
+}
+div.block-ddblock .ddblock-image-pager li img {
+  border: none;
+  display: inline;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+div.block-ddblock ul.ddblock-image-pager {display:block;position:relative;}
+div.block-ddblock ul.ddblock-image-pager  {list-style-type:none;margin:0!important;padding:0!important;}
+div.block-ddblock ul.ddblock-image-pager li {background:#fff!important;display:inline;list-style:none!important;padding:0!important;}
+div.block-ddblock ul.ddblock-image-pager li a.pager-link{background:#fff;border:1px solid #ccc;display:block;float:left;font-family:Tahoma,Arial,sans-serif;font-size:.7em;font-weight:bold;height:55px;line-height:55px;margin:0 2px 2px 0;padding:3px;text-align:center;text-decoration:none!important;width:55px;}
+div.block-ddblock ul.ddblock-image-pager li a.activeSlide{background:#ddd;color:#fff!important;}
+div.block-ddblock ul.ddblock-image-pager li a:focus{outline:none;}
+div.block-ddblock ul.ddblock-image-pager li a.pager-link:hover{background:#ddd;color:#fff!important;}
+
+div.block-ddblock ul.ddblock-image-pager li a.prev{background:#fff!important;display:inline;list-style:none!important;padding:0!important;}
+div.block-ddblock ul.ddblock-image-pager li a.next{background:#fff!important;display:inline;list-style:none!important;padding:0!important;}
+
+
+/* default dynamic display block custom pager */
+div.block-ddblock .ddblock-custom-pager a.activeSlide  {
+background: #eee;
+}
+div.block-ddblock .ddblock-custom-pager a:focus {
+  outline: none;
+}
+
+/********************* previous next pager on slide **********************/
+div.block-ddblock div.pager-slide{
+  height: 50px;
+  position: absolute;
+  top:130px;
+  width:50px;
+  z-index:50;
+}
+div.block-ddblock div.pager-slide a{
+  display:block;
+  height:50px;
+  opacity: 0.7;
+  width:50px;
+}
+div.block-ddblock div.next-container a.next{
+  background: url(_images/next.png) no-repeat;
+}
+div.block-ddblock div.prev-container a.prev{
+  background: url(_images/prev.png) no-repeat;
+}
+div.block-ddblock div.next-container a.next:hover{
+  background: url(_images/next.png) no-repeat;
+  opacity:1;
+}
+div.block-ddblock div.prev-container a.prev:hover{
+  background: url(_images/prev.png) no-repeat;
+  opacity:1;
+}
+div.block-ddblock div.pager-slide a:focus{
+  outline:none;
+}
+/********************* previous next pager on slide **********************/
+div.block-ddblock div.prev-container{left:5px;}
+div.block-ddblock div.next-container{left:128px;}

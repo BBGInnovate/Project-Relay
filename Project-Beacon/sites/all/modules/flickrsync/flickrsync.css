@@ -1,0 +1,7 @@
+#flickrsync-import div.progress {
+  margin: 10px 0;
+}
+
+#flickrsync-import span.tag {
+  font-style: italic;
+}

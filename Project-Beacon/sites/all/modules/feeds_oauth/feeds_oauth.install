@@ -1,0 +1,92 @@
+<?php
+
+/**
+ * Implementation of hook_schema().
+ */
+function feeds_oauth_schema() {
+  $schema = array();
+
+  $schema['feeds_oauth_access_tokens'] = array(
+    'description' => t('OAuth access tokens per user per site.'),
+    'fields' => array(
+      'uid' => array(
+        'description' => t('User identifier for this token.'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'oauth_token' => array(
+        'description' => t('OAuth access token.'),
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ),
+      'oauth_token_secret' => array(
+        'description' => t('OAuth access token secret.'),
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ),
+      'site_id' => array(
+        'description' => t('Site identifier for this token.'),
+        'type' => 'varchar',
+        'length' => '50',
+        'not null' => TRUE,
+      ),
+      'timestamp' => array(
+        'description' => t('The UNIX timestamp when this token was created.'),
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'expires' => array(
+        'description' => t('The UNIX timestamp when this token will expire.'),
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'oauth_refresh_token' => array(
+        'description' => t('OAuth refresh token.'),
+        'type' => 'varchar',
+        'length' => '100',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('uid', 'site_id'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Add extra columns to 'feeds_oauth_access_token' for OAuth 2.0.
+ */
+function feeds_oauth_update_7001() {
+  db_add_field('feeds_oauth_access_tokens', 'timestamp', array(
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+    'initial' => time(),
+  ));
+  db_add_field('feeds_oauth_access_tokens', 'expires', array(
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+  ));
+  db_add_field('feeds_oauth_access_tokens', 'oauth_refresh_token', array(
+    'description' => t('OAuth refresh token.'),
+    'type' => 'varchar',
+    'length' => '100',
+    'not null' => TRUE,
+  ));
+}
+
+/**
+ * Enlarge size of oauth_token and oauth_token_secret.
+ */ 
+function feeds_oauth_update_7003() {
+  $schema = feeds_oauth_schema();
+  db_change_field('feeds_oauth_access_tokens', 'oauth_token', 'oauth_token', $schema['feeds_oauth_access_tokens']['fields']['oauth_token']);
+  db_change_field('feeds_oauth_access_tokens', 'oauth_token_secret', 'oauth_token_secret', $schema['feeds_oauth_access_tokens']['fields']['oauth_token_secret']);
+}
+

@@ -1,0 +1,6 @@
+name = "Custom module"
+description = "ajax based module for disqus"
+core = "7.x"
+version = "7.x-dev"
+scripts[] = custom.js
+stylesheets[all][] = custom.css

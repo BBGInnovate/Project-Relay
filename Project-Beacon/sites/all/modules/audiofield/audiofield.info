@@ -1,0 +1,25 @@
+name = AudioField
+description = Handle audio upload using fields.
+package = Fields
+core = 7.x
+dependencies[] = file
+files[] = audiofield.install
+files[] = audiofield.module
+files[] = audiofield_formatter.inc
+files[] = audiofield_widget.inc
+
+
+
+; Information added by drupal.org packaging script on 2011-02-20
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "audiofield"
+datestamp = "1298203622"
+
+
+; Information added by drupal.org packaging script on 2012-10-08
+version = "7.x-1.0-beta8"
+core = "7.x"
+project = "audiofield"
+datestamp = "1349709067"
+

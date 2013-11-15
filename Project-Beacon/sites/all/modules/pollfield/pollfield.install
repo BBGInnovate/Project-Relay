@@ -1,0 +1,204 @@
+<?php
+/**
+ * @file
+ * Install, update, and uninstall functions for the field_example module.
+ */
+
+/**
+ * Implements hook_field_schema().
+ *
+ * Defines the database schema of the field, using the format used by the
+ * Schema API.
+ *
+ * The data we will store here is just one 7-character element, even
+ * though the widget presents the three portions separately.
+ *
+ * All implementations of hook_field_schema() must be in the module's
+ * .install file.
+ *
+ * @see http://drupal.org/node/146939
+ * @see schemaapi
+ * @see hook_field_schema()
+ * @ingroup field_example
+ */
+function pollfield_field_schema($field) {
+  $columns = array(
+    'question' => array('type' => 'text', 'size' => 'medium', 'not null' => FALSE),
+    'choice' => array('type' => 'text', 'size' => 'medium', 'not null' => FALSE),
+    'anonymous'=> array('type' => 'text', 'size' => 'small', 'not null' => FALSE),
+    'poll_features'=>array('type' => 'text', 'size' => 'medium', 'not null' => FALSE),
+    'active' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE, 'default' => 0),
+    'runtime'=> array('type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE, 'default' => 0),
+    'votes'=> array('type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE, 'default' => 0),
+  );
+  $indexes = array(
+    
+  );
+  return array(
+    'columns' => $columns,
+    'indexes' => $indexes,
+  );
+}
+
+/**
+ * Implements hook_schema().
+ *
+ * @ingroup nodeapi_example
+ */
+function pollfield_schema() {
+
+	
+  $schema['pollfield'] = array(
+    'description' => 'Inventory of all pollfields their basic settings',
+    'fields' => array(
+      'nid' => array(
+        'description' => 'Node ID',
+        'type' => 'int',
+        'unsigned' => 1,
+        'default' => 0,
+      ),
+      'field_table' => array(
+        'description' => 'The table where the pollfield is stored',
+        'type' => 'varchar',
+        'length' => 255,
+        'default' => '',
+      ),
+      'field_name' => array(
+        'description' => 'Pollfield name',
+        'type' => 'varchar',
+        'length' => 32,
+        'default' => '',
+      ),
+      'field_name_delta' => array(
+        'description' => 'Delta for multiple fields',
+        'type' => 'int',
+        'default' => 0,
+      ),
+      'runtime' => array(
+        'description' => 'Time in seconds a pollfield is scheduled to be active',
+        'type' => 'int',
+        'default' => 0,
+      ),
+      'active' => array(
+        'description' => 'Whether the poll is active or not',
+        'type' => 'int',
+        'unsigned' => 1,
+        'default' => 0,
+      ),
+    ),
+    'indexes' => array(
+      'nid' => array('nid'),
+      'field_table' => array('field_table'),
+    ),
+  );
+	
+  $schema['pollfield_votes'] = array(
+    'description' => 'Pollfield results table',
+    'fields' => array(
+      'nid' => array(
+        'description' => 'Pollfield node ID',
+        'type' => 'int',
+        'unsigned' => 1,
+        'not null' => TRUE,
+      ),
+      'field_table' => array(
+        'description' => 'The table where the pollfield is stored',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'field_name' => array(
+        'description' => 'The table where the pollfield is stored',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'uid' => array(
+        'description' => 'Voter user ID',
+        'type' => 'int',
+        'unsigned' => 1,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'delta' => array(
+        'description' => 'Choice',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => -1,
+      ),
+      'hostname' => array(
+        'description' => 'Voter hostname',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+
+    'field_name_delta' => array(
+        'description' => 'Pollfield delta',
+        'type' => 'int',
+        'unsigned' => 1,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    'weight' => array(
+        'description' => 'Weight for mulitchoice',
+        'type' => 'int',
+        'unsigned' => 1,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    'cookie' => array(
+        'description' => 'Cookie for anonymous voters',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'indexes' => array(
+      'nid' => array('nid'),
+      'uid' => array('uid'),
+      'field_table' => array('field_table'),
+      'hostname' => array('hostname'),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ *
+ * We need to clean up our variables data when uninstalling our module.
+ *
+ * Our implementation of nodeapi_example_form_alter() automatically
+ * creates a nodeapi_example_node_type_<contentType> variable for each node type
+ * the user wants to rate.
+ *
+ * To delete our variables we call variable_del for our variables'
+ * namespace, 'nodeapi_example_node_type_'. Note that an average module would
+ * have known variables that it had created, and it could just delete those
+ * explicitly. For example, see render_example_uninstall(). It's important
+ * not to delete variables that might be owned by other modules, so normally
+ * we would just explicitly delete a set of known variables.
+ *
+ * hook_uninstall() will only be called when uninstalling a module, not when
+ * disabling a module. This allows our data to stay in the database if the user
+ * only disables our module without uninstalling it.
+ *
+ * @ingroup nodeapi_example
+ */
+function pollfield_uninstall() {
+  // Simple DB query to get the names of our variables.
+  $results = db_select('variable', 'v')
+    ->fields('v', array('name'))
+    ->condition('name', 'pollfield_%', 'LIKE')
+    ->execute();
+  // Loop through and delete each of our variables.
+  foreach ($results as $result) {
+    variable_del($result->name);
+  }
+}

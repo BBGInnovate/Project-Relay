@@ -1,0 +1,17 @@
+
+INSTALLATION:
+
+1) Place this module directory in your modules folder (this will usually be
+   "sites/all/modules/").
+
+2) Enable the module.
+
+3) Edit your account (and any accounts that want to use Flickr) and enter your Flickr username.
+
+4) Create a node content type that has a title, a body, an imagefield, and optionally a free-tagging taxonomy vocabulary.  You can name them however you like, which is nice because this content type can be used for other purposes besides Flickr images downloaded with this module.
+
+5) Go to Administer/Site configuration/Flickr Sync Settings.
+
+6) Select the node type you created earlier and then click Save configuration.  After it saves, you will be able to select the Image field you want to use for attaching Flickr photos and optionally the vocabulary you want to use for Flickr photo tags.
+
+7) Run the Flickr sync, or wait for cron.  The sync can be run by going to Administer/Content management/Flickr Refresh.

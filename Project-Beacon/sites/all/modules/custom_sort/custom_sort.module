@@ -1,0 +1,6 @@
+<?php
+
+
+function custom_sort_views_pre_render(&$view) {
+   // dsm($view->name);
+}

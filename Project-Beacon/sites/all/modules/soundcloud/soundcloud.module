@@ -1,0 +1,377 @@
+<?php
+/**
+ * @file
+ *
+ *
+ *
+ * Module to integrate SoundCloud with Drupal, using the soundcloud-async php library
+ */
+global $base_url;
+$site_path = $base_url . base_path();
+define('REDIRECT_URI', $site_path . 'soundcloud/access_token');
+
+ //including the soundcload OAuth library
+include_once('php-soundcloud/Services/Soundcloud.php');
+
+/**
+ * Implements hook_menu().
+ */
+function soundcloud_menu() {
+  $items = array();
+
+  // Callback for revoking the access keys
+  $items['user/%/soundcloud/revoke'] = array(
+    'title' => 'SoundCloud revoke',
+    'page callback' => 'soundcloud_revoke',
+    'page arguments' => array(1),
+    'access arguments' => array('connect soundcloud profile'),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['soundcloud/request_token'] = array(
+    'title' => 'SoundCloud authorize',
+    'page callback' => 'soundcloud_request_token',
+    'access arguments' => array('connect soundcloud profile'),
+    'type' => MENU_CALLBACK,
+  );
+  
+  $items['soundcloud/access_token'] = array(
+    'title' => 'SoundCloud authorize',
+    'page callback' => 'soundcloud_access_token',
+    'access arguments' => array('connect soundcloud profile'),
+    'type' => MENU_CALLBACK,
+  );
+  
+  $items['admin/settings/soundcloud'] = array(
+    'title' => 'SoundCloud',
+    'description' => 'Soundcloud settings page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('soundcloud_settings'),
+    'access arguments' => array('administer soundcloud'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function soundcloud_permission() {
+  return array(
+    'connect soundcloud profile' => array(
+      'title' => t('Connect SoundCloud profile'),
+    ),
+    'view soundcloud profile' => array(
+      'title' => t('View the SoundCloud profile'),
+    ),
+    'administer soundcloud' => array(
+      'title' => t('Administer SoundCloud settings'),
+    ),
+  );
+}
+
+/**
+ * SoundCloud settings form implemented by hook_menu
+ */
+function soundcloud_settings($form, &$form_state) {
+  $form = array();
+
+  $form['soundcloud'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('SoundCloud application keys'),
+    '#description' => t('Register your application at !soundcloud', array('!soundcloud' => l('http://soundcloud.com/you/apps', 'http://soundcloud.com/you/apps', array('target' => 'parent')))),
+  );
+
+  $form['soundcloud']['soundcloud_client_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('SoundCloud client ID'),
+    '#default_value' => variable_get('soundcloud_client_id'),
+    '#description' => t('Your SoundCloud client ID.'),
+    '#size' => 56,
+    '#maxlength' => 56,
+  );
+
+  $form['soundcloud']['soundcloud_client_secret'] = array(
+    '#type' => 'textfield',
+    '#title' => t('SoundCloud client secret key'),
+    '#default_value' => variable_get('soundcloud_client_secret'),
+    '#description' => t('Your SoundCloud client secret.'),
+    '#size' => 56,
+    '#maxlength' => 56,
+  );
+
+  $form['soundcloud']['soundcloud_redirect_uri'] = array(
+    '#type' => 'item',
+    '#title' => t('SoundCloud redirect URI'),
+    '#description' => t('Please note to set this redirect URI at your SoundCloud application setting page, on the OAuth2 tab: !soundcloud', array('!soundcloud' => l('http://soundcloud.com/you/apps', 'http://soundcloud.com/you/apps', array('target' => 'parent')))),
+    '#markup' => REDIRECT_URI,
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+ * Initialize SoundCloud object
+ */
+function soundcloud_initialize() {
+  $client_id = variable_get('soundcloud_client_id');
+  $client_secret = variable_get('soundcloud_client_secret');
+  $soundcloud = new Services_Soundcloud($client_id, $client_secret, REDIRECT_URI);
+
+  return $soundcloud;
+}
+
+/**
+ * Token request callback
+ */
+function soundcloud_request_token() {
+  $soundcloud = soundcloud_initialize();
+  $params = array(
+    'display' => 'popup',
+  );
+  $authorizeUrl = $soundcloud->getAuthorizeUrl($params);
+
+  return $authorizeUrl;
+}
+
+/**
+ * Token access callback
+ */
+function soundcloud_access_token() {
+  global $user;
+  $uid = $user->uid;
+
+  if (isset($_GET['code'])) {
+    $soundcloud = soundcloud_initialize();
+
+    try {
+      $accessToken = $soundcloud->accessToken($_GET['code']);
+      soundcloud_store_access_token($accessToken['access_token'], $accessToken['expires_in'], $accessToken['scope'], $accessToken['refresh_token'], $uid);
+    } catch (Services_Soundcloud_Invalid_Http_Response_Code_Exception $e) {
+      exit($e->getMessage());
+    }
+
+    drupal_goto('user');
+  }
+  else {
+    drupal_set_message(t('Code not received from SoundCloud'), 'error');
+    drupal_goto('user');
+  }
+}
+
+/**
+ * Implements hook_user_view().
+ */
+function soundcloud_user_view($account, $view_mode, $langcode) {
+  global $user;
+
+  if ($user->uid == $account->uid) {
+    if (!isset($account->content['soundcloud'])) {
+      $account->content['soundcloud'] = array(
+        '#type'       => 'user_profile_category',
+        '#title'      => t('SoundCloud'),
+        '#attributes' => array('class' => array('user-member')),
+        '#weight'     => 5,
+      );
+    }
+    $value = soundcloud_generate_button($account->uid);
+
+    $account->content['soundcloud']['connect'] = array(
+      '#type'   => 'user_profile_item',        
+      '#title'  => '',
+      '#markup' => $value, // '#value'  => $value,
+      // '#weight' => 1,
+    );
+  }
+}
+
+/**
+ * Helper function to determine if a user can see the profile information
+ * @param $profile_uid
+ *  uid of the profile that is being viewed
+ */
+function soundcloud_view_profile_permission($profile_uid) {
+  global $user;
+  if (($user->uid != $profile_uid && user_access('view soundcloud profile')) || $user->uid == $profile_uid) {
+    return TRUE;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+
+/**
+ * Store a token
+ */
+function soundcloud_store_access_token($access_token, $expires_in, $scope, $refresh_token, $uid) {
+  if (empty($uid)) {
+    global $user;
+    $uid = $user->uid;
+  }
+
+  $client_id = variable_get('soundcloud_client_id');
+  $client_secret = variable_get('soundcloud_client_secret');
+
+  $res = db_insert('soundcloud_tokens')
+    ->fields(array(
+      'uid' => $uid,
+      'client_id' => $client_id,
+      'client_secret' => $client_secret,
+      'access_token' => $access_token,
+      'expires_in' => $expires_in + time(),
+      'scope' => $scope,
+      'refresh_token' => $refresh_token,
+      'permalink' => '',
+    ))
+    ->execute();
+}
+
+/**
+ * Load a token, based on the key
+ * @param $token_key
+ *  key of the token.
+ * @return
+ *  the token if a token is found. NULL is no token is found.
+ */
+function soundcloud_load_token($token_key) {
+  $result = db_query("SELECT * FROM {soundcloud_tokens} WHERE client_id = :client_id", array(':client_id' => $token_key))->fetchField();
+  if ($token = $result) {
+    return $token;
+  }
+  return NULL;
+}
+
+/**
+ * Load a token for a specific user
+ * @param $uid
+ *  uid of the user for who the token must be loaded
+ * @return
+ *  the token if a token is found. NULL is no token is found.
+ */
+function soundcloud_load_user_token($uid) {
+  $result = db_query("SELECT access_token, refresh_token FROM {soundcloud_tokens} WHERE uid = :uid", array(':uid' => $uid))->fetchAssoc();
+  if ($token = $result) {
+    return $token;
+  }
+  return NULL;
+}
+  
+/**
+ * Remove a token, based on the key
+ * @param $token_key
+ *  key of the token.
+ */
+function soundcloud_remove_token($token_key) {
+  db_delete('soundcloud_tokens')
+    ->condition('access_token', $token_key)
+    ->execute();
+}
+
+/**
+ * Check if a token is still valid.
+ * @param $uid
+ *  user id
+ * @return
+ *  TRUE of FALSE. In case the token is not valid, it is removed from the database!
+ */
+function soundcloud_check_token($uid) {
+  $result = db_query("SELECT * FROM {soundcloud_tokens} WHERE uid = :uid", array(':uid' => $uid))->fetchAssoc();
+  // $result = db_query("SELECT * FROM {soundcloud_tokens} WHERE uid = :uid AND expires_in > :expires_in", array(':uid' => $uid, ':expires_in' => time()))->fetchAssoc();
+  if ($token = $result) {
+    // delete token if expired
+    if ($token['expires_in'] > time()) {
+      return TRUE;
+    }
+    else {
+      db_query("DELETE FROM {soundcloud_tokens} WHERE uid = :uid", array(':uid' => $uid));
+      return FALSE;
+    }
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Code that generates the SoundCloud buttons
+ * @param $uid
+ *  the user id of the user for who to generate the button
+ * @return
+ *  the html code that generates the SoundCloud buttons
+ */
+function soundcloud_generate_button($uid) {
+  if (soundcloud_check_token($uid)) {
+    $button = '/' . drupal_get_path('module', 'soundcloud') . '/images/btn-disconnect-m.png';
+    $output = '<a href="' . drupal_get_path_alias('/user/' . $uid . '/soundcloud/revoke') . '" style="border: 0; background: transparent url(\'' . $button .'\') top left no-repeat;display: block; text-indent: -9999px; width: 290px; height: 44px; margin-bottom: 10px;" id="sc-connect">Disconnect from SoundCloud</a>';
+  }
+  else {
+    $button = '/' . drupal_get_path('module', 'soundcloud') . '/images/btn-connect-sc-m.png';
+    $output = '<a href="' . soundcloud_request_token() . '" style="border: 0; background: transparent url(\'' . $button .'\') top left no-repeat;display: block;text-indent: -9999px; width: 210px; height: 28px;" id="sc-connect">Connect with SoundCloud</a>';
+  }
+  return $output;
+}
+
+/**
+ * Helper function to receive the 'me' user object.
+ * @return
+ *  a profile array
+ */
+function soundcloud_me($uid) {
+  if (empty($uid)) {
+    global $user;
+    $uid = $user->uid;
+  }
+
+  // create SoundCloud object
+  $soundcloud = soundcloud_create_soundcloud($uid);
+
+  // get user object
+  try {
+    $me = json_decode($soundcloud->get('me'), TRUE);
+  } catch (Services_Soundcloud_Invalid_Http_Response_Code_Exception $e) {
+    exit($e->getMessage());
+  }
+
+  return $me;
+}
+
+/**
+ * Revoke the access key of the user
+ * @param $uid
+ *  User id of the user who's access key should be revoked
+ */
+function soundcloud_revoke($uid) {
+  if ($token = soundcloud_load_user_token($uid)) {
+    soundcloud_remove_token($token['access_token']);
+  }
+  else {
+    drupal_set_message(t('Token revoke error.'), 'error');
+  }
+  drupal_goto('user');
+}
+
+/**
+ * Return a SoundCloud object created by the php-soundcloud library
+ *
+ * @param $uid
+ *  the user id for who to create a SoundCloud object
+ * @return
+ *  SoundCloud object
+ */
+function soundcloud_create_soundcloud($uid) {
+  $client_id = variable_get('soundcloud_client_id');
+  $client_secret = variable_get('soundcloud_client_secret');
+
+  // get our access token from db for actual user
+  if ($token = soundcloud_load_user_token($uid)) {
+    $soundcloud = new Services_Soundcloud($client_id, $client_secret, REDIRECT_URI);
+    $soundcloud->setAccessToken($token['access_token']);
+    return $soundcloud;
+  }
+  else {
+    drupal_set_message(t('Error creating SoundCloud object, cannot find access token for this user'), 'error');
+    return NULL;
+  }
+}

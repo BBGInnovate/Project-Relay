@@ -1,0 +1,46 @@
+/*
+ * Change Log for ddblock module
+ */
+2011-OCT-17
+#1258820 fix timeout of 0 not used 
+#1258820 fix speed of 0 not used 
+#1258780 use custom.substr(0,1) instead of custom[0] to compare first character to prevent error in IE7
+Check if scrollable pager element is available before using jquery methods on the object
+Add option to use scrollable pager 70, 80 and 90 in ddblock.admin.js
+ 
+2011-JUL-25
+Adjust readme.txt
+
+2011-JUL-23 
+#1226554 fix pause on hover always used in basic options
+
+2011-JUL-18
+Add easing support for slide and slidetext using jquery UI
+#1190082 improve help text for choosing content types
+add nr_of_items functionality for custom pager
+adjust nr_of_items help text
+improve help text for before and after effects
+Cycle plugin now via libraries
+
+2011-FEB-14
+#1058868 Adjust install.txt
+bug-fix  Add pagerPosition to javascript settings for horizontal/vertical scrollable pager
+bug-fix  Add pager_toggle to variables given to content template file to toggle the pager on/off
+bug-fix  add hyphen (-) to mask for finding size-xxx files
+
+2011-FEB-11
+#1049556 fix delete of blocks
+#1053996 fix warnings when no images
+#1055048 fix remove extra slide div not closed
+#1054488 fix remove extra commit button on config page
+ 
+2011-JAN-29 
+Fixed redirects after forms are submitted
+Rename function _dir_scan_directory to _ddblock_dir_scan_directory
+Fixed Notice: Undefined property: stdClass::$ddblock_enabled on delete form 
+Fixed db_affected_rows() does not exist anymore in Drupal 7
+Cleanup CHANGELOG.TXT file
+
+2011-JAN-25 
+Initial version
+

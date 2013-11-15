@@ -1,0 +1,24 @@
+; $Id$
+name = Constant contact
+description = "This module integrates features from the <a href='http://bit.ly/cctrial' target='_blank
+'>Constant Contact</a> API into your drupal website"
+package = Mail
+configure = admin/config/services/constant_contact
+
+files[] = class.cc
+files[] = constant_contact.install
+files[] = constant_contact.module
+files[] = admin.activities.inc
+files[] = admin.export.inc
+files[] = admin.import.inc
+files[] = admin.lists.inc
+files[] = admin.system.inc
+
+core = 7.x
+version = "7.x-3.x"
+; Information added by drupal.org packaging script on 2012-11-28
+version = "7.x-3.6"
+core = "7.x"
+project = "constant_contact"
+datestamp = "1354125710"
+

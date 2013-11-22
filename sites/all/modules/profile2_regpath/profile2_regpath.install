@@ -1,0 +1,141 @@
+<?php
+
+/**
+ * @file
+ * Install file for the profile2_regpath module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function profile2_regpath_schema() {
+  $schema['profile2_regpath'] = array(
+    'description' => 'Stores registration path information for profile2 profiles',
+    'fields' => array(
+      'profile_id' => array(
+        'description' => 'Profile2 profile ID',
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'path' => array(
+        'description' => 'Profile-specific registration form path',
+        'type' => 'varchar',
+        'length' => '2048',
+        'not null' => FALSE,
+      ),
+      'roles' => array(
+        'description' => 'Array of role ids',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+      ),
+      'status' => array(
+        'description' => 'Enabled or disabled',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'weight' => array(
+        'description' => 'Weight of profile type',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'misc' => array(
+        'description' => 'Miscellaneous display settings',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array('profile_id'),
+    'indexes' => array(
+      'type' => array(array('path', 255)),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_enable().
+ */
+function profile2_regpath_enable() {
+  drupal_set_message(st('Profile2 Registration Path has been enabled. To configure profile registration paths, edit a profile type on the ' . l('Profile Types administration page', 'admin/structure/profiles.')), 'status');
+}
+
+/**
+ * Implements hook_update_n().
+ */
+function profile2_regpath_update_7100() {
+  // Add roles column.
+  $roles_spec = array(
+    'description' => 'Array of role ids',
+    'type' => 'text',
+    'size' => 'big',
+    'not null' => FALSE,
+  );
+  db_add_field('profile2_regpath', 'roles', $roles_spec);
+
+  // Change length of path column.
+  $path_spec = array(
+    'description' => 'Profile-specific registration form path',
+    'type' => 'varchar',
+    'length' => '2048',
+    'not null' => FALSE,
+  );
+  db_change_field('profile2_regpath', 'path', 'path', $path_spec);
+}
+
+/**
+ * Implements hook_update_n().
+ */
+function profile2_regpath_update_7110() {
+  // Add weight column.
+  $weight_specs = array(
+    'description' => 'Weight of profile type',
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+  );
+  db_add_field('profile2_regpath', 'weight', $weight_specs);
+}
+
+
+/**
+ * Implements hook_update_n().
+ */
+function profile2_regpath_update_7120() {
+  drupal_set_message(t('The Profile2 Registration Path URL pattern has changed. Please check your site to be sure that this has not broken any links.'));
+}
+
+/**
+ * Implements hook_update_n().
+ */
+function profile2_regpath_update_7130() {
+  // Add weight column.
+  $misc_specs = array(
+    'description' => 'Miscellaneous display settings',
+    'type' => 'text',
+    'size' => 'big',
+    'not null' => FALSE,
+  );
+  db_add_field('profile2_regpath', 'misc', $misc_specs);
+
+  $profile_types = profile2_regpath_get_profiles();
+  foreach ($profile_types as $key => $value) {
+    // Check for name space collisions after changing URL pattern.
+    // We must make exceptions for '/user' and other p2rp registered paths.
+    if ($value->path != 'user' && $existing_item = menu_get_item($value->path)) {
+      if ($existing_item['page_callback'] != '_profile2_regpath_user_login') {
+        drupal_set_message(t("Error, there is a name space collision between and existing URL alias and the Profile2 Registration path '@path'", array('@path' => $value->path)));
+        module_disable(array('profile2_regpath'));
+      }
+    }
+    // Check to see if selected path is being used by an alias.
+    if ($existing_alias = drupal_lookup_path('source', $value->path)) {
+      drupal_set_message(t("Error, there is a name space collision between and existing URL alias and the Profile2 Registration path '@path'", array('@path' => $value->path)));
+      module_disable(array('profile2_regpath'));
+    }
+  }
+}

@@ -1,9 +1,16 @@
 <?php
+
 function custom_module_menu() {
 $items['custommodule/disqus/ajax'] = array(
     'title' => t('Test'),
     'type' => MENU_CALLBACK,
     'page callback' => 'custom_module_disqus_ajax',
+    'access arguments' => array('access content'),
+  );
+$items['custommodule/alerts/ajax'] = array(
+    'title' => t('Alers'),
+    'type' => MENU_CALLBACK,
+    'page callback' => 'custom_module_alerts_ajax',
     'access arguments' => array('access content'),
   );
  return $items;
@@ -44,11 +51,11 @@ function custom_module_mail($key, &$message, $params) {
   $node=node_load($node_id);
   $langcode = $message['language']->language;
   $message['subject'] = 'Please resend your Beacon card request';
-  $body_top = 'Hi, <br/>  the email you sent in to create a card on Beacon does not contain the information needed to create the type of card you intended to publish.<br/>'. 'The contents of your email was as follows:<br /> Subject:'.$node->field_email_subject['und']['0']['value'].'<br/>Body:'.$node->field_email_body['und']['0']['value'].'<br />';
+  $body_top = 'Hi, <br/>  the email you sent in to create a card on Beacon does not contain the information needed to create the type of card you intended to publish.<br/>'. 'The contents of your email was as follows:<br /><br /> Subject:'.$node->field_email_subject['und']['0']['value'].'<br/>Body:'.$node->field_email_body['und']['0']['value'].'<br />';
   $body_help = 'Please see below for the correct format for each type.<br />';
-  $body_article = '<b><u>Article</u></b><br/><b>Subject:</b> article #eventcontenttag<br/><b>Body:</b><br/>headline<br/>article author name<br/>read more url<br/>article intro text<br/>';
-  $body_editor = '<b><u>Editor Message</u></b><br/><b>Subject:</b>editor message #eventcontenttag<br/><b>Body:</b><br/>Editor Message text<br/>';
-  $body_tweet = '<b><u>Featured Tweet</u></b><br/><b>Subject:</b>tweet #eventcontenttag<br/><b>Body:</b><br/>tweet embed code<br/>';
+  $body_article = '<br/><b><u>Article</u></b><br/><b>Subject:</b> article #eventcontenttag<br/><b>Body:</b><br/>headline<br/>article author name<br/>read more url<br/>article intro text<br/>';
+  $body_editor = '<br/><b><u>Editor Message</u></b><br/><b>Subject:</b>editor message #eventcontenttag<br/><b>Body:</b><br/>Editor Message text<br/>';
+  $body_tweet = '<br/><b><u>Featured Tweet</u></b><br/><b>Subject:</b>tweet #eventcontenttag<br/><b>Body:</b><br/>tweet embed code<br/>';
   $message['body'][] =$body_top.$body_help.$body_article.$body_editor.$body_tweet;
   break;
 case 'notice_housing_student':
@@ -59,4 +66,23 @@ case 'notice_housing_student':
   $message['params']['attachments'][] = $attachment;
   break;
   }
+}
+function custom_module_alerts_ajax($type = 'ajax') {
+	if ($type == 'ajax') {
+		global $user;
+               
+		$account = user_load($user->uid);
+                $event_id = $_POST['nid'];
+		$node=node_load($event_id);
+		og_group('node', $node->nid, array(
+            "entity type"       => "user",
+            "entity"        => $account,
+            "membership type"   => OG_MEMBERSHIP_TYPE_DEFAULT,
+        ));
+
+		// Changes the users role in the group (1 = non-member, 2 = member, 3 = administrator member)
+		og_role_grant('node', $node->nid, $account->uid, 3); 
+		$msg = "You have successfully opted for getting the alerts";
+		return drupal_json_output($msg);
+	}
 }

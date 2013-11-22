@@ -6,9 +6,9 @@ core = 7.x
 dependencies[] = notifications
 configure = admin/config/messaging
 
-; Information added by drupal.org packaging script on 2013-10-01
-version = "7.x-1.0-alpha2+2-dev"
+; Information added by drupal.org packaging script on 2011-12-04
+version = "7.x-1.0-alpha2"
 core = "7.x"
 project = "notifications"
-datestamp = "1380594569"
+datestamp = "1323032143"
 

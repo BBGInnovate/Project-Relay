@@ -1,0 +1,40 @@
+/*** change some ctools styles ***/
+#modalBackdrop {
+  position: fixed !important;
+}
+
+div.ctools-modal-content .modal-content {
+  padding: 15px;
+}
+
+div.ctools-modal-content .modal-content .modal-throbber-wrapper img {
+  padding: 2em 0 3em;
+  margin: 0;
+}
+
+div.ctools-modal-content .form-item label {
+  float: none;
+  width: auto;
+}
+
+div.ctools-modal-content a.close {
+  margin-top: 3px;
+}
+
+/*** module styles ***/
+.ajax-register-links-wrapper {
+  text-align: right;
+  font-size: 12px;
+}
+
+.ajax-register-links-wrapper .ajax-register-links li {
+  padding-left: 1em;
+}
+
+.ajax-register-links-wrapper .ajax-register-links li a {
+  border-bottom: 1px dashed #ccc;
+}
+
+.ajax-register-links .ajax-progress {
+  display: none;
+}

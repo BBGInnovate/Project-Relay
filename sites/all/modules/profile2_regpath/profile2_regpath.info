@@ -1,0 +1,11 @@
+name = Profile2 Registration Path
+description = Attach profile2 profile forms to profile-specific registration urls.
+core = 7.x
+dependencies[] = profile2
+files[] = profile2_regpath.test
+; Information added by drupal.org packaging script on 2012-10-23
+version = "7.x-1.12"
+core = "7.x"
+project = "profile2_regpath"
+datestamp = "1351035738"
+

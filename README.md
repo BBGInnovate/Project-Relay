@@ -13,4 +13,4 @@ We focused in on four features that would make the product most useful to both o
 For each breaking news item, an event is created that reporters and users can follow and contribute to. As new developments occur, additional cards appear in a timeline structure with the most recent stories available for users to view. Administrators can create events and assign users roles. Editors can create and edit events, assign reporters, publish and unpublish events, receive alerts, and moderate comments. Reporters can create and edit cards for the events for which they are authorized, moderate comments, and receive alerts. Users can comment on, share, and view published events.
 
 ### Contact Information:
-Product Lead | Randy Abramson | rabramson@bbg.gov | 202.382.8280 (o) | 516.850.2666 (c)
+Product Lead | Randy Abramson | rabramson@bbg.gov | 202.382.8280 (o)

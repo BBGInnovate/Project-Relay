@@ -425,7 +425,7 @@ div.status {
     width: 73%;
 }
 div.status, table tr.ok {
-    color: #FFFFFF;
+    color: #000;
 }
 div.messages {
     margin: 0 auto;
@@ -826,6 +826,12 @@ ul.dropdown-menu li.active a.active {
 body.node-type-event #header{
 	display: none;
 }
+body.node-type-event #header{
+	display: none;
+}
+body.node-type-event .node-edit{
+	display: block!important;
+}
 .addthis_toolbox {
     border-top: 1px solid #707070;
     margin-top: 25px;
@@ -1100,6 +1106,16 @@ div.password-confirm {
 #modalContent .ctools-modal-content #modal-content #edit-profile-main .field-widget-text-textfield {
   float: none;
 }
+
+
+div.warning, .warning,table tr.warning {display: none !important;}
+
+.view-event-card .views-slideshow-cycle-main-frame-row .card-ur .span7 .title-icon span{direction: ltr;}
+.view-event-card .views-slideshow-cycle-main-frame-row .card-ur .span7 {direction: rtl!important;}
+.view-event-card .views-slideshow-cycle-main-frame-row .card-ur .span8 {direction: rtl!important;}
+.view-event-card .views-slideshow-cycle-main-frame-row .card-ur .span8 div {direction: rtl!important;}
+
+
 /***************************************************************************************************************************************************/
 /*Media Queries*/
 /***************************************************************************************************************************************************/

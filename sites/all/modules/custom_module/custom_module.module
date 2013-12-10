@@ -58,6 +58,24 @@ function custom_module_mail($key, &$message, $params) {
   $body_tweet = '<br/><b><u>Featured Tweet</u></b><br/><b>Subject:</b>tweet #eventcontenttag<br/><b>Body:</b><br/>tweet embed code<br/>';
   $message['body'][] =$body_top.$body_help.$body_article.$body_editor.$body_tweet;
   break;
+  case 'members':
+  $langcode = $message['language']->language;
+  $card_type = $params['type'];
+  $event_id = $params['event_id'];
+  $event_node = node_load($event_id);
+  $event_name = $event_node->title;
+  $message['subject'] = 'A new '.$card_type.' card has been added to '.$event_name;
+  //$node_id=$params['created_node'];
+  //$node=node_load($node_id);
+  //$langcode = $message['language']->language;
+  //$message['body'][] =$body_top.$body_help.$body_article.$body_editor.$body_tweet;
+  $body_membership = $card_type.' card has been added to '.$event_name.', a Relay event you are following. To view this update go to:';
+ global $base_url;
+ $event_url = 'node/'.$event_id;
+$alias = drupal_get_path_alias($event_url);
+$path = $base_url.'/'.$alias;
+  $message['body'][] = $body_membership."<a href='$path'>$alias</a>";
+  break;
 case 'notice_housing_student':
   $node_email = node_load(94);
   $langcode = $message['language']->language;

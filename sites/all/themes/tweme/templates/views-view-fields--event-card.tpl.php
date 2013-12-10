@@ -25,7 +25,19 @@
  */
 ?>
 <?php $type = $row->field_field_card_type['0']['raw']['value'];?>
-<?php echo "<div class='card-$type'>"; ?>
+<?php $lang = $row->node_language;
+if($lang == 'ur'){
+    $card_language = 'card-ur';
+}
+elseif($lang == 'en'){
+    $card_language = 'card-en';
+}
+else{
+    $card_language = 'card-nuetral';
+
+}
+?>
+<?php echo "<div class='card-$type $card_language'>"; ?>
 <?php echo "<div class='row'>"; ?>
 <?php foreach ($fields as $id => $field): ?>
   <?php if (!empty($field->separator)): ?>

@@ -17,6 +17,7 @@
 /**
  * User interface for the language overview screen.
  */
+
 function locale_languages_overview_form() {
   drupal_static_reset('language');
   $languages = language_list('language');

@@ -37,7 +37,13 @@
 
 <?php if ($preface): ?>
 <!-- Header -->
-<header id="header" class="container-wrapper">
+<?php 
+$edit_class = '';
+if((arg(0)=='node') && (is_numeric(arg(1)) && (arg(2)=='edit'))){
+$edit_class = 'node-edit';
+}
+?>
+<header id="header" class="container-wrapper <?php echo $edit_class; ?>">
   <div class="container">
     <?php print $preface ?>
   </div>

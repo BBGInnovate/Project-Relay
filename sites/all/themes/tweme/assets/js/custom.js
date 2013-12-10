@@ -9,21 +9,10 @@ $(document).ready(function() {
     
 	//jQuery(".views_slideshow_jcarousel_pager_item .views-field-php").insertBefore(".views_slideshow_jcarousel_pager_item .views-field-created");
 
-//Add Nicescroll script - TEMPORARY
-$('head').append('<script src="/sites/all/themes/tweme/assets/js/jquery.nicescroll.min.js"></script>');
-/*$('head').append('<script src="/sites/all/themes/tweme/assets/js/jquery.touchwipe.1.1.1.js"></script>');*/
+/*$('head').append('<script src="/sites/all/themes/tweme/assets/js/jquery.nicescroll.min.js"></script>');
 $('head').append('<script src="/sites/all/themes/tweme/assets/js/jquery.touchSwipe.min.js"></script>');
+*/
 
-function deviceWidth() { 
-	var w = document.documentElement.clientWidth;
-	
-	window.onresize=function(){
-		w = document.documentElement.clientWidth;
-	console.log('resize deviceWidth='+w);
-	};
-	
-	return w;
-}
 //Set the width of the SoundCloud iframe
 function setSoundCloudWidth() {
 	var w = document.documentElement.clientWidth;
@@ -31,13 +20,7 @@ function setSoundCloudWidth() {
 	$('.media-soundcloud-preview-wrapper iframe').attr('width', scw);
 }
 
-deviceWidth();
 setSoundCloudWidth();
-
-//Reset width on window resize
-window.onresize=function(){
-	deviceWidth();
-};
 
 //Responsive Iframes
 var el = $(this);
@@ -280,3 +263,14 @@ if(!mobileCheck()) {
 
 });
 })(jQuery);
+jQuery(document).ready(function(){
+
+    jQuery(document).bind('DOMNodeInserted', function(event) {
+        if(jQuery(event.target).attr('class') == 'messages status' && jQuery(event.target).parent('div').attr('id')=='modal-content'){
+            setTimeout(function(){location.reload();},1000);
+        }
+    });   
+
+
+});
+

@@ -19,6 +19,8 @@ stylesheets[all][] = assets/css/global.css
 
 scripts[] = assets/js/drupal.js
 scripts[] = assets/js/custom.js
+scripts[] = assets/js/jquery.nicescroll.min.js
+scripts[] = assets/js/jquery.touchSwipe.min.js
 
 regions[header] = Header
 regions[header_top] = Header Top

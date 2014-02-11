@@ -79,6 +79,28 @@ body{
 	color: #FFFFFF;
 	text-decoration: none;
 }
+/* notifications block */
+#header-top #block-block-10{
+	border: none;
+}
+#header-top .notifications{
+	position: relative;
+	display: block;
+	cursor: pointer;
+	padding: 10px 5px;
+}
+#header-top .notifications div.menu-item {
+    background: url("../images/alert-bell-blue.png") no-repeat 0 bottom transparent;
+    width: 25px;
+    height: 25px;
+}
+#header-top .notifications .notification-count{
+	position: relative;
+	float: right;
+	right: -15px;
+	top: 5px;
+}
+
 
 #main{
 	/*background: #404040;*/ 

@@ -13,6 +13,15 @@ $items['custommodule/alerts/ajax'] = array(
     'page callback' => 'custom_module_alerts_ajax',
     'access arguments' => array('access content'),
   );
+  // Return the total count of cards for given event (group id)
+  $items['event/%/count'] = array(
+      'title' => t('Event Card Count'),
+      'page callback' => 'custom_module_card_count',
+      'page arguments' => array(1),
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+  );
+
  return $items;
 }
 function custom_module_disqus_ajax($type = 'ajax') {
@@ -103,4 +112,26 @@ function custom_module_alerts_ajax($type = 'ajax') {
 		$msg = "You have successfully opted for getting the alerts";
 		return drupal_json_output($msg);
 	}
+}
+
+/**
+* Output the number of cards for an group in JSON
+*/
+function custom_module_card_count($gid = 0) {
+    drupal_add_http_header('Content-Type', 'application/javascript; utf-8');
+    $output = array('count' => '0');
+    if(is_numeric($gid)){
+      //create the query
+      $query = new EntityFieldQuery();
+      $query->entityCondition('entity_type', 'og_membership', '=')
+        ->entityCondition('status', 1)
+        ->propertyCondition('entity_type', 'node', '=')
+        ->propertyCondition('field_name', 'og_group_ref', '=')
+        ->propertyCondition('gid', $gid, '=')
+        ->count();
+        $output['count'] = $query->execute();
+    }
+    //output json result
+    echo json_encode($output);
+    exit(0);
 }

@@ -7,6 +7,30 @@ return check; }
 (function ($) {
 $(document).ready(function() {
     
+	/**
+	 * Begin listening for new content
+	 */
+	if(Drupal.settings.ogContext !== undefined && Drupal.settings.ogContext.gid !== undefined){
+	    gid = Drupal.settings.ogContext.gid;
+	    currentCount = Drupal.settings.viewsSlideshowCycle["#views_slideshow_cycle_main_event_card-block_1"].num_divs;
+	    $('.notifications').on("click", '.notifications .menu-item, .notifications .notification-count', function(){
+	    	//cheap: force a page refresh to show new content
+	    	location.reload();
+	    });
+	    setInterval(function() {
+	    	var call = $.getJSON( "event/" + gid + "/count", function(data) {
+			  if(data.count > currentCount){
+			  	//set the number of new items
+	            $('.notifications .notification-count').text(data.count - currentCount);
+	            //display notification
+	            $('.notifications').show();
+			  } else {
+				$('.notifications').hide();
+			  }
+			});
+	    }, 10000);
+	}
+
 	//jQuery(".views_slideshow_jcarousel_pager_item .views-field-php").insertBefore(".views_slideshow_jcarousel_pager_item .views-field-created");
 
 /*$('head').append('<script src="/sites/all/themes/tweme/assets/js/jquery.nicescroll.min.js"></script>');
@@ -270,7 +294,29 @@ jQuery(document).ready(function(){
             setTimeout(function(){location.reload();},1000);
         }
     });   
-
+    jQuery('#edit-field-card-headline').addClass("hidden");
+    jQuery('#edit-field-author').addClass("hidden");
+    //Add card node hide
+    jQuery('#edit-field-card-type .form-radio').click(function(){
+        if(jQuery(this).attr("id")=="edit-field-card-type-und-producermessage" || jQuery(this).attr("id")=="edit-field-card-type-und-ftweet" || jQuery(this).attr("id")=="edit-field-card-type-und-poll"){
+            jQuery('#edit-field-card-headline').addClass("hidden");
+            jQuery('#edit-field-author').addClass("hidden");
+        }
+        else{
+            jQuery('#edit-field-card-headline').removeClass("hidden");
+            jQuery('#edit-field-author').removeClass("hidden");
+        }
+    });
+    /*Custom code to hide description field*/
+    jQuery('#edit-field-card-type .form-radio').click(function(){
+        if(jQuery(this).attr("id")=="edit-field-card-type-und-producermessage" || jQuery(this).attr("id")=="edit-field-card-type-und-ftweet" || jQuery(this).attr("id")=="edit-field-card-type-und-article"){
+            jQuery('#edit-field-card-description').addClass("hidden");
+        }
+        else{
+             jQuery('#edit-field-card-description').removeClass("hidden");
+            }
+    });
+    /*end of custom code*/
 
 });
 

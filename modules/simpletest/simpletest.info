@@ -54,9 +54,3 @@ files[] = tests/upgrade/update.aggregator.test
 files[] = tests/upgrade/update.trigger.test
 files[] = tests/upgrade/update.field.test
 files[] = tests/upgrade/update.user.test
-
-; Information added by drupal.org packaging script on 2013-08-08
-version = "7.23"
-project = "drupal"
-datestamp = "1375928238"
-

@@ -1,5 +1,5 @@
 <?php
-ini_set('allow_url_fopen', 'on');
+
 /**
  * @file
  * Drupal site-specific configuration file.
@@ -215,11 +215,11 @@ $databases = array (
   array (
     'default' => 
     array (
-      'database' => 'drupal7',
-      'username' => 'admin',
-      'password' => 'admin',
+      'database' => 'relay-top',
+      'username' => 'root',
+      'password' => 'drag0nr3d',
       'host' => 'localhost',
-      'port' => '',
+      'port' => '8889',
       'driver' => 'mysql',
       'prefix' => '',
     ),
@@ -256,7 +256,7 @@ $update_free_access = FALSE;
  *   $drupal_hash_salt = file_get_contents('/home/example/salt.txt');
  *
  */
-$drupal_hash_salt = 'amEpCaGcP8pue4k88hrPTBMQW1tG9IjWeEZZXxxHNBM';
+$drupal_hash_salt = 'HHYhcivwiT6r8SeAMQmshHVoEFwlNf7OQhQvaYsu3yw';
 
 /**
  * Base URL (optional).
@@ -565,3 +565,4 @@ $conf['404_fast_html'] = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN"
  * Remove the leading hash signs to disable.
  */
 # $conf['allow_authorize_operations'] = FALSE;
+

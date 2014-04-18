@@ -17,7 +17,6 @@
 /**
  * User interface for the language overview screen.
  */
-
 function locale_languages_overview_form() {
   drupal_static_reset('language');
   $languages = language_list('language');
@@ -1243,9 +1242,7 @@ function locale_translate_delete_page($lid) {
   if ($source = db_query('SELECT lid, source FROM {locales_source} WHERE lid = :lid', array(':lid' => $lid))->fetchObject()) {
     return drupal_get_form('locale_translate_delete_form', $source);
   }
-  else {
-    return drupal_not_found();
-  }
+  return MENU_NOT_FOUND;
 }
 
 /**

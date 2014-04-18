@@ -5,9 +5,3 @@ base theme = test_basetheme
 hidden = TRUE
 
 settings[subtheme_override] = subtheme value
-
-; Information added by drupal.org packaging script on 2013-08-08
-version = "7.23"
-project = "drupal"
-datestamp = "1375928238"
-

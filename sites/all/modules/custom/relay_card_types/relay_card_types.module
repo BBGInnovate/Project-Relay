@@ -1,0 +1,473 @@
+<?php
+
+/**
+ * Includes the field defentions for content types
+ */
+require_once ( dirname(__FILE__) . '/relay_card_types.fields.inc' );
+require_once ( dirname(__FILE__) . '/relay_card_types.libraries.inc' );
+require_once ( dirname(__FILE__) . '/relay_card_types.rules.inc' );
+
+function relay_card_types_requirements($phase){
+  //
+  $requirements = array();
+
+  //
+  if( $phase == 'runtime' ){
+
+    //verify the libraries we need are there
+    if( !relay_card_types_verify_vimeo_library() ){
+      $requirements['relay_vimeo_library_required'] = array(
+        'title' => t('Vimeo PHP library missing'), 
+        'description' => t('Description'), 
+        'severity' => REQUIREMENT_ERROR
+      );      
+    }
+
+    //verify the libraries we need are there
+    if( !relay_card_types_verify_youtube_library() ){
+      $requirements['relay_youtube_library_required'] = array(
+        'title' => t('YouTube PHP library missing'), 
+        'description' => t('Description'), 
+        'severity' => REQUIREMENT_ERROR
+      );      
+    }
+
+    //verify the libraries we need are there
+    if( !relay_card_types_verify_twitter_library() ){
+      $requirements['relay_twitter_library_required'] = array(
+        'title' => t('Twitter PHP library missing'), 
+        'description' => t('Description'), 
+        'severity' => REQUIREMENT_ERROR
+      );      
+    }
+
+    //verify the libraries we need are there
+    if( !relay_card_types_verify_sound_cloud_library() ){
+      $requirements['relay_vimeo_sound_cloud_required'] = array(
+        'title' => t('SoundCloud PHP library missing'), 
+        'description' => t('Description'), 
+        'severity' => REQUIREMENT_ERROR
+      );      
+    }
+  }
+
+  //
+  return $requirements;
+}
+
+/**
+ * Implements hook_libraries_info().
+ *
+ * For defining external libraries.
+ */
+function relay_card_types_libraries_info() {
+
+  //insures the twitter api
+  $libraries['twitter_api'] = array(
+    'name' => 'Twitter for PHP',
+    'vendor url' => 'https://github.com/dg/twitter-php/releases/tag/v3.3',
+    'download url' => 'https://github.com/dg/twitter-php/releases/tag/v3.3',
+    'version arguments' => array(
+      'file' => 'src/twitter.class.php', // Could be any file with version info
+      'pattern' => '/version\s+(\d+\.\d+)/',
+      'lines' => 20,
+    ),
+    'files' => array(
+      'php' => array('src/twitter.class.php'),
+    ),
+  );
+
+  //insures the vimeo library is installed
+  $libraries['vimeo_api'] = array(
+    'name' => 'Vimeo for PHP',
+    'vendor url' => 'https://github.com/vimeo/vimeo.php',
+    'download url' => 'https://github.com/vimeo/vimeo.php',
+    'version arguments' => array(
+      'file' => 'vimeo.php', // Could be any file with version info
+      'pattern' => '/Version (\d+\.\d+)/',
+      'lines' => 20,
+    ),
+    'files' => array(
+      'php' => array('vimeo.php'),
+    ),
+  );
+
+  //insures the youtube library is installed
+  /*
+  $libraries['youtube_api'] = array(
+    'name' => 'Simple library',
+    'vendor url' => 'https://github.com/google/google-api-php-client',
+    'download url' => 'https://github.com/google/google-api-php-client',
+    'version arguments' => array(
+      'file' => 'simple.js', // Could be any file with version info
+      'pattern' => '/Version (\d+)/',
+      'lines' => 5,
+    ),
+    'files' => array(
+      'php' => array('simple.js'),
+    ),
+  );
+  */
+
+  //insures the sound cloud library is installed
+  $libraries['soundcloud_api'] = array(
+    'name' => 'SoundCloud API',
+    'vendor url' => 'https://github.com/mptre/php-soundcloud',
+    'download url' => 'https://github.com/mptre/php-soundcloud',
+    'version arguments' => array(
+      'file' => 'CHANGELOG.md', // Could be any file with version info
+      'pattern' => '/## v(\d+\.\d+\.\d+)/',
+      'lines' => 5,
+    ),
+    'files' => array(
+      'php' => array('Services/Soundcloud.php'),
+    ),
+  );
+  return $libraries;
+}
+
+/**
+ * Implement hook_form()
+ */
+function relay_card_types_menu() {
+
+    //
+    $menu = array();
+
+    //
+    $menu['admin/config/system/relay'] = array(
+        'title' => 'Relay Configuration',
+        'description' => 'Configuration settings for Relay',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('_relay_card_types_configuration_form'),
+        'access arguments' => array('adminster relay'),
+        'file' => 'relay_card_types.admin.inc',
+    );
+
+    //
+    $menu['admin/config/system/relay_cron'] = array(
+        'title' => 'Run Relay Cron',
+        'description' => 'Run cron for Relay',
+        'page callback' => 'drupal_get_form',
+        'access arguments' => array('adminster relay'),
+        'file' => 'relay_card_types.admin.inc',
+    );
+
+    //
+    return $menu;
+}
+
+/**
+ * Implement hook_permission()
+ */
+function relay_card_types_permission() {
+
+  //
+  $perimssions = array(
+    'adminster relay' => array(
+      'title' => t('Administer Relay'),
+      'description' => t('Perform administration tasks for Relay.'),
+    ),
+    'approve cards in relay queue' => array(
+      'title' => t('Approve Relay Cards'),
+      'description' => t('Can approve unpublished cards for publishing.')
+    ),
+    'email cards to relay' => array(
+      'title' => t('Email Cards to Relay'),
+      'description' => t('Cards received by relay are accepted and converted.')
+    ),
+    'publish cards by email to relay' => array(
+      'title' => t('Email Cards to Relay and Publish'),
+      'description' => t('Cards emailed to relay get published immediatley.')
+    )
+  );
+
+  //
+  return $perimssions;
+}
+
+/**
+ * Implements hook_node_info()
+ */
+function relay_card_types_node_info() {
+    return array(
+        'relay_audio' => array(
+            'name' => t('Relay Audio'),
+            'base' => 'relay_card_types',
+            'description' => t('A Audio card that is the base of other modules.'),
+            'has_title' => '1',
+            'has_body' => '1',
+            'title_label' => t('Audio Title'),
+            'locked' => TRUE
+         ),
+        'relay_photo' => array(
+            'name' => t('Relay Photo'),
+            'base' => 'relay_card_types',
+            'description' => t('A Photo card that is the base of other modules.'),
+            'has_title' => '1',
+            'has_body' => '1',
+            'title_label' => t('Photo Title'),
+            'locked' => TRUE
+         ),
+        'relay_editorial' => array(
+            'name' => t('Relay Update'),
+            'base' => 'relay_card_types',
+            'description' => t('A Editorial card that is the base of other modules.'),
+            'has_title' => '1',
+            'has_body' => '1',
+            'title_label' => t('Editorial Title'),
+            'locked' => TRUE
+         ),
+        'relay_article' => array(
+            'name' => t('Relay Article'),
+            'base' => 'relay_card_types',
+            'description' => t('A Article card that is the base of other modules.'),
+            'has_title' => '1',
+            'has_body' => '1',           
+            'title_label' => t('Article Title'),
+            'locked' => TRUE
+         ),
+        'relay_tweet' => array(
+            'name' => t('Relay Featured Tweet'),
+            'base' => 'relay_card_types',
+            'description' => t('A Tweet Card that is the base of other modules.'),
+            'has_title' => '1',
+            'has_body' => '1',            
+            'title_label' => t('Tweet Title'),
+            'locked' => TRUE
+         ),
+        'relay_video' => array(
+            'name' => t('Relay Video'),
+            'base' => 'relay_card_types',
+            'description' => t('A Video card that is the base of other modules.'),
+            'has_title' => '1',
+            'has_body' => '1',            
+            'title_label' => t('Video Title'),
+            'locked' => TRUE
+         ),
+        'relay_live' => array(
+            'name' => t('Relay Live Video Report'),
+            'base' => 'relay_card_types',
+            'description' => t('A Live Stream card that is the base of other modules.'),
+            'has_title' => '1',
+            'has_body' => '1',            
+            'title_label' => t('Live Stream Title'),
+            'locked' => TRUE
+         ),
+        'relay_msg_src' => array(
+            'name' => t('Relay Email Message'),
+            'base' => 'relay_card_types',
+            'description' => t('A message received from the attached e-mail box.  Messages are parsed and converted into the proper content type'),
+            'has_title' => '1',
+            'has_body' => '1',            
+            'title_label' => t('Subject'),
+            'locked' => TRUE
+         )        
+    );
+}
+
+/*
+* Implements hook_cron()
+*/
+function relay_card_types_cron(){
+
+  //alert that this is running
+  watchdog( 'relay_card_types', t('Relay Cron now running.') );
+  
+  //relay_card_types_check_mailhandler();
+
+  //As a back up run operations when cron runs
+  relay_card_types_poll_cron();
+}
+
+/**
+ * Implement hook_form()
+ */
+function relay_card_types_form($node, &$form_state) {
+
+  //
+  return node_content_form($node, $form_state);
+}
+
+/**
+ * Implements hook_node_type_insert().
+ */
+function relay_card_types_node_type_insert($content_type) {
+
+  //the fields to add to this content type
+  $fields = array();
+  $instances = array();
+
+  //content types
+  $content_types = array('relay_audio','relay_photo','relay_editorial','relay_article','relay_tweet','relay_video','relay_live');
+
+  //add the fields if its in the array only
+  if (in_array( $content_type->type, $content_types) ) {
+
+    //applies the fields all cards have in common
+    //only do this once ever
+    if( !isset( $_SESSION['content_types_created'] ) )
+      _relay_card_types_base_fields( $fields );
+
+    //creates instances for the fields all cards have in common
+    _relay_card_types_base_field_instances( $instances );
+
+    //turns commenting off for these items 0=disabled, 1=read, 2=read and write
+    variable_set('comment_' . $content_type->type, '0');    
+
+    //adds the fields depending on the content type
+    switch( $content_type->type ) {
+        case 'relay_audio':
+            node_add_body_field($content_type, 'Description');
+            _relay_card_types_audio_fields( $fields );
+            _relay_card_types_audio_field_instances( $instances );
+            break;
+
+        case 'relay_photo':
+            node_add_body_field($content_type, 'Description');
+            _relay_card_types_photo_fields( $fields );
+            _relay_card_types_photo_field_instances( $instances );
+            break;        
+
+        case 'relay_editorial':
+            node_add_body_field($content_type, 'Message');
+            _relay_card_types_editorial_fields( $fields );
+            _relay_card_types_editorial_field_instances( $instances );            
+            break;
+
+        case 'relay_article':
+            node_add_body_field($content_type, 'Article Intro');
+            _relay_card_types_article_fields( $fields );
+            _relay_card_types_article_field_instances( $instances );            
+            break;
+
+        case 'relay_tweet':
+            node_add_body_field($content_type, 'Tweet');
+            _relay_card_types_tweet_fields( $fields );
+            _relay_card_types_tweet_field_instances( $instances );            
+            break;
+
+        case 'relay_video':
+            node_add_body_field($content_type, 'Description');
+            _relay_card_types_video_fields( $fields );
+            _relay_card_types_video_field_instances( $instances );            
+            break;
+
+        case 'relay_live':
+            node_add_body_field($content_type, 'Description');
+            _relay_card_types_live_fields( $fields );
+            _relay_card_types_live_field_instances( $instances );            
+            break;                                                
+    }
+
+    // create all our custom fields
+    foreach ( $fields as $field) {
+      field_create_field($field);
+    }
+ 
+    // create all the instances for our fields
+    foreach ( $instances as $instance) {
+      $instance['entity_type'] = 'node';
+      $instance['bundle'] = $content_type->type;
+      field_create_instance($instance);
+    }
+
+/*
+    //
+    user_role_grant_permissions( variable_get( 'relay_editor_role', '')->rid,
+      array(
+        'create ' . str_replace( "_"," ", $content_type->type ) . ' content',
+        'edit own ' . str_replace( "_"," ", $content_type->type ) . ' content',
+        'edit any ' . str_replace( "_"," ", $content_type->type ) . ' content',
+        'delete own ' . str_replace( "_"," ", $content_type->type ) . ' content',
+        'delete any ' . str_replace( "_"," ", $content_type->type ) . ' content',
+      )
+    );
+
+    //
+    user_role_grant_permissions( variable_get( 'relay_managing_reporter_role', '')->rid,
+      array(
+        'create ' . str_replace( "_"," ", $content_type->type ) . ' content',
+        'edit own ' . str_replace( "_"," ", $content_type->type ) . ' content',
+        'delete own ' . str_replace( "_"," ", $content_type->type ) . ' content',
+      )
+    );
+
+    //
+    user_role_grant_permissions( variable_get( 'relay_reporter_role', '')->rid,
+      array(
+        'create ' . str_replace( "_"," ", $content_type->type ) . ' content',
+        'edit own ' . str_replace( "_"," ", $content_type->type ) . ' content',
+      )
+    );
+*/
+
+    //increments to keep track of the number of content types created
+    $_SESSION['content_types_created'] = TRUE;
+  }
+
+  //creates the message source for connecting to mailhandler module and feeds
+  if( $content_type->type == 'relay_msg_src' )
+  {
+    //
+    node_add_body_field($content_type, 'Message Body');
+
+    //
+    _relay_card_types_msg_src_fields( $fields );
+    _relay_card_types_msg_src_field_instances( $instances );
+
+    // create all our custom fields
+    foreach ( $fields as $field) {
+      field_create_field($field);
+    }
+ 
+    // create all the instances for our fields
+    foreach ( $instances as $instance) {
+      $instance['entity_type'] = 'node';
+      $instance['bundle'] = $content_type->type;
+      field_create_instance($instance);
+    }
+  }
+}
+
+//
+function relay_card_types_taxonomy_vocabulary_insert($vocabulary) {
+
+  //the fields to add to this vocab type
+  $fields = array();
+  $instances = array();
+
+  //add fields if a event vocab eas created
+  if( $vocabulary->machine_name == 'relay_events' ){
+
+    //
+    _relay_card_types_event_vocab_fields( $fields );
+    _relay_card_types_event_vocab_field_instances( $instances );
+
+    // create all our custom fields
+    foreach ( $fields as $field) {
+      field_create_field($field);
+    }
+ 
+    // create all the instances for our fields
+    foreach ( $instances as $instance) {
+      $instance['entity_type'] = 'taxonomy_term';
+      $instance['bundle'] = $vocabulary->machine_name;
+      field_create_instance($instance);
+    }
+
+   //prepopulate with a term
+   $term = new stdClass();
+   $term->name = 'Ungrouped Cards';
+   $term->vid = $vocabulary->vid;
+
+   //save the term
+   taxonomy_term_save( $term );
+
+   //save the default taxonomy term id
+   variable_set( 'relay_default_event', $term->tid );
+
+
+  }
+}
+

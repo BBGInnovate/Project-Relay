@@ -1,0 +1,141 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function relay_card_types_install() {
+
+    //delete the default article node type
+    //node_type_delete('article');    //maybe a bad idea? prob is.
+    
+    //creates a vocabulary for events
+    $event_vocab = new stdClass();
+    $event_vocab->name = 'Events';
+    $event_vocab->machine_name = 'relay_events';
+    $event_vocab->description = '';
+    $event_vocab->locked = '1';
+
+    //save the vocab
+    taxonomy_vocabulary_save( $event_vocab );
+
+    //
+    variable_set( 'relay_event_vid', $event_vocab->vid );
+
+    //create a editor role
+    $editor_role = new stdClass();
+    $editor_role->name = 'Editor';
+
+    //save the role
+    user_role_save( $editor_role );
+
+    //
+    variable_set( 'relay_editor_role', $editor_role );
+
+    //permissions to grant this user
+    user_role_grant_permissions( $editor_role->rid, array(
+        'email cards to relay',
+        'publish cards by email to relay',
+        'approve cards in relay queue',
+    ));
+
+    //create a reporter role
+    $managing_reporter_role = new stdClass();
+    $managing_reporter_role->name = 'Managing Reporter';
+
+    //save the reporter role
+    user_role_save( $managing_reporter_role );
+
+    //
+    variable_set( 'relay_managing_reporter_role', $editor_role );
+
+    //permissions to grant this user
+    user_role_grant_permissions( $managing_reporter_role->rid, array(
+        'email cards to relay',
+        'publish cards by email to relay',
+    ));
+
+    //create a reporter role
+    $reporter_role = new stdClass();
+    $reporter_role->name = 'Reporter';
+
+    //save the reporter role
+    user_role_save( $reporter_role );
+
+    //
+    variable_set( 'relay_reporter_role', $editor_role );
+
+    //permissions to grant this user
+    user_role_grant_permissions( $reporter_role->rid, array(
+        'email cards to relay',
+    ));
+
+    //seeds the poll interval to 10 minutes on default
+    variable_set( 'relay_poll_interval', 2);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function relay_card_types_uninstall() {
+
+    //all the content types
+    $content_types = array('relay_audio','relay_photo','relay_editorial','relay_article','relay_tweet','relay_video','relay_live', 'relay_msg_src');
+
+    //this should delete all the content before deleting the nodes
+    //
+
+    //deletes all of the content types from the database
+    foreach ($content_types as $ct) {
+        node_type_delete( $ct );
+    }
+
+    //all of the fields to delete
+    $fields = array('relay_pin_card','relay_authors','relay_events_ref','relay_addthis','relay_audio_file','relay_photo_file','relay_editor_email','relay_more_link','relay_video_file','relay_live_embed_code', 'relay_hashtag', 'relay_to', 'relay_from', 'relay_youtube_code', 'relay_tweet_status_id');
+
+    //deletes all of the fields in the listing
+    foreach ($fields as $field) {
+        field_delete_field( $field );
+    }
+
+    //delete taxonomy terms
+    $event_vocab = taxonomy_vocabulary_machine_name_load('relay_events');
+    if(  $event_vocab ) taxonomy_vocabulary_delete( $event_vocab->vid);
+
+    //
+    variable_del( 'relay_editor_role');
+    variable_del( 'relay_managing_reporter_role');
+    variable_del( 'relay_reporter_role');
+
+    //this really should delete the roles and the taxonomy terms too right?
+    user_role_delete( 'Editor' );
+    user_role_delete( 'Managing Reporter' );
+    user_role_delete( 'Reporter' );
+
+    //delete all the variables this app stores
+    variable_del( 'relay_default_event' );
+    variable_del( 'relay_flickr_enabled' );
+    variable_del( 'relay_flickr_push_enabled' ); 
+    variable_del( 'relay_vimeo_enabled' );
+    variable_del( 'relay_vimeo_push_enabled' ); 
+    variable_del( 'relay_vimeo_application_id' );
+    variable_del( 'relay_vimeo_application_secret' );
+    variable_del( 'relay_vimeo_access_token' );
+    variable_del( 'relay_youtube_enabled' );
+    variable_del( 'relay_youtube_push_enabled' ); 
+    variable_del( 'relay_youtube_key' );
+    variable_del( 'relay_sound_cloud_enabled' );
+    variable_del( 'relay_sound_cloud_push_enabled' );     
+    variable_del( 'relay_sound_cloud_key' );
+    variable_del( 'relay_twitter_enabled' );
+    variable_del( 'relay_twitter_push_enabled' );     
+    variable_del( 'relay_twitter_push_enabled_types' );     
+    variable_del( 'relay_twitter_api_key' );
+    variable_del( 'relay_twitter_api_secret_key' );
+    variable_del( 'relay_twitter_access_token' );
+    variable_del( 'relay_twitter_access_token_secret' );
+    variable_del( 'relay_poll_interval' );
+    variable_del( 'relay_cron_last_run' );
+
+    //flush this out to prevent install script from failing
+    $_SESSION['content_types_created'] = null;
+}

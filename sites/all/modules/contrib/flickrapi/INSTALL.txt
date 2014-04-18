@@ -1,0 +1,19 @@
+INSTALLATION:
+
+1) Download and enable the Oauth module (http://drupal.org/project/oauth).
+
+2) Place the FlickrAPI module directory in your modules folder (this will
+   usually be "sites/all/modules/").
+
+3) Enable the module.
+
+4) Go to admin/config/media/flickrapi
+
+5) Enter your API Key and optionally your API Shared Secret. See
+   http://www.flickr.com/services/api to register for a key.
+
+6) After saving, the form will send you to Flickr.com to authenticate
+   your website using OAuth. You will have 'read' permissions by default.
+
+7) More permissions (write/delete) or disabling caching can be set using the
+   the Advanced Settings. Changing permissions afterwards forces you to re-authenticate.

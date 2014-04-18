@@ -1,0 +1,32 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the audio.js module.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function audio_js_requirements($phase) {
+  $requirements = array();
+
+  if ($phase == 'runtime') {
+    $t = get_t();
+    $library = libraries_get_path('audiojs');
+
+    if (empty($library)) {
+      $requirements['audio_js'] = array(
+        'title' => $t('audio.js'),
+        'value' => $t('audio.js javascript library not found.'),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => $t('You need to download the !audio_js, extract the archive and place the audiojs directory in the %path directory on your server.', array(
+          '!audio_js' => l($t('audio.js plugin'), 'http://kolber.github.com/audiojs/'),
+          '%path' => 'sites/all/libraries')
+        ),
+      );
+    }
+  }
+
+  return $requirements;
+}

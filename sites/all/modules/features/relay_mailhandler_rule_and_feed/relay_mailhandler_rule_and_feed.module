@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Relay Mailhandler Rules and Feeds feature.
+ */
+
+include_once 'relay_mailhandler_rule_and_feed.features.inc';

@@ -1,0 +1,784 @@
+<?php
+/**
+ * @file
+ * Helps site builders and module developers investigate a site.
+ */
+
+/**
+ * Implements hook_form_alter().
+ */
+function xray_form_alter(&$form, &$form_state, $form_id) {
+  $form['xray_display_form_id'] = array(
+    '#type' => 'item',
+    '#theme_wrappers' => array('container__xray__form'),
+    '#attributes' => array('class' => array('xray')),
+    '#title' => 'Form ID',
+    '#markup' => $form_id,
+    '#weight' => -100,
+  );
+}
+
+/**
+ * Implements hook_help().
+ */
+function xray_help($path, $arg) {
+  $help = '';
+  // Display in a help message the function which provides the current page.
+  $help .= xray_show_page_callback($path);
+  switch ($path) {
+    // For the main administrative sections, provide summaries of what the site
+    // is made of.
+    case 'admin/content':
+      $variables = array('data' => xray_content_summary());
+      return $help . theme('xray_content_summary', $variables);
+    case 'admin/structure':
+      $variables = array('data' => xray_structure_summary());
+      return $help . theme('xray_structure_summary', $variables);
+    case 'admin/appearance':
+      $variables = array('data' => xray_appearance_summary());
+      return $help . theme('xray_appearance_summary', $variables);
+    case 'admin/people':
+      $variables = array('data' => xray_people_summary());
+      return $help . theme('xray_people_summary', $variables);
+    case 'admin/modules':
+      $variables = array('data' => xray_modules_summary());
+      return $help . theme('xray_modules_summary', $variables);
+    // The main help page for the module itself.
+    case 'admin/help#xray':
+      // This is shown as a regular page; do not include the 
+      // xray_show_page_callback $help or it is shown twice.
+      return _xray_help_page();
+    default:
+      return $help;
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function xray_menu() {
+  $items = array();
+  $items['admin/reports/xray'] = array(
+    'title' => 'X-ray technical site overview',
+    'description' => 'See the internal structure of this site.',
+    'page callback' => 'xray_overview_page',
+    'access arguments' => array('access site reports'),
+  );
+  $items['admin/reports/xray/overview'] = array(
+    'title' => 'Overview',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  $items['admin/reports/xray/permissions'] = array(
+    'title' => 'Permissions',
+    'page callback' => 'xray_permission_names_page',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
+    'access arguments' => array('access site reports'),
+  );
+  $items['admin/reports/xray/hooks'] = array(
+    'title' => 'Hooks',
+    'page callback' => 'xray_hook_implementations_page',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 20,
+    'access arguments' => array('access site reports'),
+  );
+  $items['admin/reports/xray/conf'] = array(
+    'title' => 'Configuration variables',
+    'page callback' => 'xray_reports_conf_vars_page',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 20,
+    'access arguments' => array('access site reports'),
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function xray_theme() {
+  return array(
+    'xray_permission_names' => array(
+      'render element' => 'names',
+    ),
+    'xray_show_page_callback' => array(
+      'variables' => array(
+        'page_callback' => NULL,
+        'include_file' => NULL,
+        'page_arguments' => NULL,
+      ),
+    ),
+    'xray_appearance_summary' => array(
+      'variables' => array(
+        'data' => array(),
+        'attributes' => array('class' => 'xray-help'),
+      ),
+    ),
+    'xray_content_summary' => array(
+      'variables' => array(
+        'data' => array(),
+        'attributes' => array('class' => 'xray-help'),
+      ),
+    ),
+    'xray_structure_summary' => array(
+      'variables' => array(
+        'data' => array(),
+        'attributes' => array('class' => 'xray-help'),
+      ),
+    ),
+    'xray_people_summary' => array(
+      'variables' => array(
+        'data' => array(),
+        'attributes' => array('class' => 'xray-help'),
+      ),
+    ),
+    'xray_modules_summary' => array(
+      'variables' => array(
+        'data' => array(),
+        'attributes' => array('class' => 'xray-help'),
+      ),
+    ),
+  );
+}
+
+/**
+ * Overview page.
+ */
+function xray_overview_page() {
+  $build = array();
+  $build['intro'] = array(
+    '#markup' => '<p>' . t("Technical overview of the site's internals.  These summaries also appear / can be configured to appear on main administration section.") . '</p>',
+  );
+  // Repeat each summary from the top of each administrative section.
+  $build['admin_content_title'] = array(
+    '#prefix' => '<h3>',
+    '#markup' => t('Content summary'),
+    '#suffix' => '</h3>',
+  );
+  $data = xray_content_summary();
+  $build['content_summary'] = array(
+    '#theme' => 'xray_content_summary',
+    '#data' => $data,
+    '#attributes' => array('class' => 'xray-report'),
+  );
+
+  $build['structure_title'] = array(
+    '#prefix' => '<h3>',
+    '#markup' => t('Structure summary'),
+    '#suffix' => '</h3>',
+  );
+  $data = xray_structure_summary();
+  $build['structure_summary'] = array(
+    '#theme' => 'xray_structure_summary',
+    '#data' => $data,
+    '#attributes' => array('class' => 'xray-report'),
+  );
+
+  $build['appearance_title'] = array(
+    '#prefix' => '<h3>',
+    '#markup' => t('Appearance summary'),
+    '#suffix' => '</h3>',
+  );
+  $data = xray_appearance_summary();
+  $build['appearance_summary'] = array(
+    '#theme' => 'xray_appearance_summary',
+    '#data' => $data,
+    '#attributes' => array('class' => 'xray-report'),
+  );
+
+  $build['people_title'] = array(
+    '#prefix' => '<h3>',
+    '#markup' => t('People summary'),
+    '#suffix' => '</h3>',
+  );
+  $data = xray_people_summary();
+  $build['people_summary'] = array(
+    '#theme' => 'xray_people_summary',
+    '#data' => $data,
+    '#attributes' => array('class' => 'xray-report'),
+  );
+
+  $build['modules_title'] = array(
+    '#prefix' => '<h3>',
+    '#markup' => t('Modules summary'),
+    '#suffix' => '</h3>',
+  );
+  $data = xray_modules_summary();
+  $build['modules_summary'] = array(
+    '#theme' => 'xray_modules_summary',
+    '#data' => $data,
+    '#attributes' => array('class' => 'xray-report'),
+  );
+  return $build;
+}
+
+/**
+ * Display permission machine and display names in a table.
+ *
+ * @return
+ *   An array as expected by drupal_render().
+ */
+function xray_permission_names_page() {
+  $build = array();
+  // Gather the data, an array of human-readable names keyed by machine names.
+  $names = xray_permission_names();
+  // Format the results as a table.
+  $header = array(t('Permission title'), t('Permission machine name'));
+  $rows = array();
+  foreach ($names as $machine_name => $title) {
+    $rows[] = array($title, $machine_name);
+  }
+  $build['names_table'] = array(
+    '#theme' => 'table__xray__permission_names',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#attributes' => array('id' => 'xray-permission-names')
+  );
+  return $build;
+}
+
+/**
+ * Collect permission names.
+ */
+function xray_permission_names() {
+  $names = array();
+  $permissions = module_invoke_all('permission');
+  // Extract just the permission title from each permission array.
+  foreach ($permissions as $machine_name => $permission) {
+    $names[$machine_name] = $permission['title'];
+  }
+  // Put permission names in alphabetical order by title.
+  asort($names);
+  return $names;
+}
+
+/**
+ * Table of available hooks and the modules implementing them, if any.
+ */
+function xray_hook_implementations_page() {
+  $build = array();
+  $build['intro'] = array(
+    '#markup' => t("This table shows Drupal hooks present in your site's code and their implementing modules.  <em>Note:  Only hook invocations involving <a href=\"@module-implements\">module_implements()</a>, which is used by <a href=\"@module-invoke-all\">module_invoke_all()</a> but not by <a href=\"@module-invoke\">module_invoke()</a> for example, are captured here.</em>  A list of all properly documented hooks in Drupal core (marked by <tt>@addtogroup hooks</tt> in code or api.php files) is online at <a href=\"@module-inc-hooks\">Drupal API Hooks page</a>.",
+    array('@module-implements' => '', '@module-invoke-all' => '', '@module-invoke' => '', '@module-inc-hooks' => 'http://api.drupal.org/api/drupal/includes--module.inc/group/hooks/7'))
+  );
+  debug(cache_get('hook_info', 'cache_bootstrap'));
+  // @TODO - fix - foreach ->data throws an error if run immediately after cache clear.
+  $implementations = cache_get('module_implements', 'cache_bootstrap');
+  $header = array(t('Hook'), t('Implementing modules'));
+  $rows = array();
+  foreach ($implementations->data as $hook => $keys_modules) {
+    if (empty($keys_modules)) {
+      $modules_text = t('<em>None</em>');
+    }
+    else {
+      $modules = array_keys($keys_modules);
+      $modules_text = theme('item_list', array('items' => $modules));
+    }
+    $rows[] = array($hook, $modules_text);
+  }
+  $build['hook_table'] = array(
+    '#theme' => 'table__xray__hook_implementations',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#attributes' => array('id' => 'xray-hook-implementations'),
+  );
+  // Return the renderable array that we've built for the page.
+  return $build;
+}
+
+/**
+ * Table of settings in the variable table, which is output as the $conf array.
+ */
+function xray_reports_conf_vars_page() {
+  global $conf;
+  debug($conf);
+  return '';
+}
+
+/**
+ * Help page for the X-ray module.
+ */
+function _xray_help_page() {
+  $output = '';
+  $output .= '<h3>' . t('About') . '</h3>';
+  $output .= '<p>' . t('X-ray module provides a look at the skeletal structure of your site from several perspectives intended to benefit developers and site builders.') . '</p>';
+  $output .= '<p>' . t('It adds an accounting summary of relevant objects to the help above the main administrative sections (blocks, content types, menus on <a href="@structure">Structure</a>; themes on <a href="@appearance">Appearance</a>; etc).', array('@structure' => url('admin/structure'), '@appearance' => url('admin/appearance'))) . '</p>';
+  $output .= '<h3>' . t('Uses') . '</h3>';
+  $output .= '<dl>';
+  $output .= '<dt>' . t('Page callback and arguments') . '</dt>';
+  $output .= '<dd>' . t('X-ray exposes the function which is primarily responsible for providing a given page in a help message at the top of that page.  It precedes the name of the function with the arguments handed it, if any.  It also provides the name of the file where this function lives if available (the file is only available if the callback does not live in a .module).  Note that just because arguments are handed in to a function does not mean they are used.') . '</dd>';
+  $output .= '</dl>';
+  return $output;
+}
+
+/**
+ * Summary data for Content section (admin/content).
+ */
+function xray_content_summary() {
+  $data = array();
+  // Fetch the summary of content (nodes) on the site.
+  $result = db_query('SELECT type, status, COUNT(nid) as NUM FROM {node} n GROUP BY type, status ORDER BY type ASC, status DESC')->fetchAll(PDO::FETCH_ASSOC);
+  $data['content_by_type_status'] = $result;
+  return $data;
+}
+
+/**
+ * Returns HTML text summary of Content section (admin/content) data.
+ *
+ * @param $attributes
+ *   (optional) An associative array of HTML tag attributes, suitable for
+ *   flattening by drupal_attributes().
+ * @param $variables
+ *   An associative array containing:
+ *   - data: result of xray_content_summary().
+ *
+ * @ingroup themeable
+ */
+function theme_xray_content_summary($variables) {
+  $data = $variables['data'];
+  $attr = drupal_attributes($variables['attributes']);
+
+  $output = '';
+  $output .= "<p $attr>";
+  if (!$data['content_by_type_status']) {
+    $output .= t("There is no content on this site.");
+  }
+  else {
+    $output .= t('This site has ');
+    $total = 0;
+    $list = array();
+    foreach ($data['content_by_type_status'] as $tsn) {
+      $type = $tsn['type'];
+      $status = $tsn['status'] ? t('enabled') : t('disabled');
+      $num = $tsn['num'];
+      $list[] = format_plural($num,
+        '1 !status %type node',
+        '@count !status %type nodes',
+        array('%type' => $type, '!status' => $status)
+      );
+      $total += $num;
+    }
+    // If we have more than one item in the list, give the total.
+    if (count($list) > 1) {
+      $output .= t('@count pieces of content (called nodes), including ',
+        array('@count' => $total)
+      );
+    }
+    $output .= xray_oxford_comma_list($list);
+  }
+  $output .= '</p>';
+  return $output;
+}
+
+/**
+ * Summary data for Structure section (admin/structure).
+ */
+function xray_structure_summary() {
+  $data = array();
+  $data['blocks_enabled_by_theme'] = xray_stats_blocks_enabled_by_theme();
+  $data['block_total'] = xray_stats_block_total();
+  $data['content_type_total'] = xray_stats_content_type_total();
+  // @TODO menu, taxonomy
+  return $data;
+}
+
+/**
+ * Returns HTML text summary of Structure section (admin/structure) data.
+ *
+ * @param $attributes
+ *   (optional) An associative array of HTML tag attributes, suitable for
+ *   flattening by drupal_attributes().
+ * @param $variables
+ *   An associative array containing:
+ *   - data: result of xray_structure_summary().
+ *
+ * @ingroup themeable
+ */
+function theme_xray_structure_summary($variables) {
+  // Make direct variables of xray_structure_summary()'s data elements.
+  extract($variables['data'], EXTR_SKIP);
+  $attributes = drupal_attributes($variables['attributes']);
+
+  $output = '';
+  $output .= "<p $attributes>";
+  $output .= t('This site has @total blocks available.  Of these, ',
+             array('@total' => $block_total));
+  $list = array();
+  foreach ($blocks_enabled_by_theme as $theme => $num) {
+    $item = '';
+    $item .= format_plural($num, '1 is enabled', '@count are enabled');
+    $item .= ' ' . t('on %theme', array('%theme' => $theme));
+    if ($theme == variable_get('default_theme', 'bartik')) {
+      $item .= t(', the default theme');
+    }
+    elseif ($theme == variable_get('admin_theme', 'seven')) {
+      $item .= t(', the admin theme');
+    }
+    $list[] = $item;
+  }
+  $output .= xray_oxford_comma_list($list, array('comma' => '; '));
+  $output .= '.  ';
+  $output .= format_plural($content_type_total,
+    'The site has one content type.',
+    'The site has @count content types.'
+  );
+// debug(field_info_bundles());
+  return $output;
+}
+
+/**
+ * Summary data for Appearance section (admin/appearance).
+ */
+function xray_appearance_summary() {
+  $data = array();
+  $data['themes'] = xray_stats_enabled_themes();
+  return $data;
+}
+
+/**
+ * Returns HTML text summary of Appearance section (admin/appearance) data.
+ *
+ * @param $attributes
+ *   (optional) An associative array of HTML tag attributes, suitable for
+ *   flattening by drupal_attributes().
+ * @param $variables
+ *   An associative array containing:
+ *   - data: result of xray_appearance_summary().
+ *
+ * @ingroup themeable
+ */
+function theme_xray_appearance_summary($variables) {
+  $themes = $variables['data']['themes'];
+  // Collapse attributes for paragraph tag to a string.
+  $attr = drupal_attributes($variables['attributes']);
+
+  $output = '';
+  $output .= "<p $attr>";
+  $output .= t('This site ');
+  $output .= format_plural(
+    $themes['num_themes'] - $themes['num_hidden'],
+    'has only one theme available',
+    'has @count themes available'
+  );
+  $output .= format_plural(
+    $themes['num_hidden'],
+    ' plus one hidden theme.',
+    ' plus @count hidden themes.'
+  );
+  $output .= '  ';
+  $output .= t('Of the non-hidden themes, ');
+  $output .= format_plural(
+    $themes['num_enabled'],
+    'one is enabled.  The enabled theme ',
+    '@count are enabled.  In the enabled themes, '
+  );
+  $summaries = array();
+  foreach ($themes['summaries'] as $name => $info) {
+    $summary = '';
+    $summary .= $name . ' ';
+    $summary .= format_plural(
+      $info['regions'],
+      'has one region',
+      'has @count regions'
+    );
+    if ($info['overlay_regions'] || $info['regions_hidden']) {
+      $summary .= ' ' . t('(including ');
+      $summary .= format_plural(
+        $info['overlay_regions'],
+        'one overlay region',
+        '@count overlay regions'
+      );
+      $summary .= ' ' . t('and') . ' ';
+      $summary .= format_plural(
+        $info['regions_hidden'],
+        'one hidden region',
+        '@count hidden regions'
+      );
+      $summary .= ')';
+    }
+    $summaries[] = $summary;
+  }
+  $output .= xray_oxford_comma_list($summaries);
+  $output .= '.';
+  $output .= '</p>';
+  return $output;
+}
+
+/**
+ * Summary data for People section (admin/people).
+ */
+function xray_people_summary() {
+  $data = array();
+  // Fetch the number of enabled and disabled (blocked) users.
+  $query = db_select('users')
+    ->fields('users', array('status'))
+    ->condition('uid', 0, '<>');
+  $num = $query->addExpression('COUNT(uid)', 'num');
+  $result = $query
+    ->groupBy('status')
+    ->execute()
+    ->fetchAllKeyed();
+  $data['users'] = $result;
+  // @TODO roles, permissions
+  return $data;
+}
+
+/**
+ * Returns HTML text summary of People section (admin/people) data.
+ *
+ * @param $attributes
+ *   (optional) An associative array of HTML tag attributes, suitable for
+ *   flattening by drupal_attributes().
+ * @param $variables
+ *   An associative array containing:
+ *   - data: result of xray_people_summary().
+ *
+ * @ingroup themeable
+ */
+function theme_xray_people_summary($variables) {
+  $data = $variables['data'];
+  // Collapse attributes for paragraph tag to a string.
+  $attr = drupal_attributes($variables['attributes']);
+  
+  $output = '';
+  $output .= "<p $attr>";
+  $output .= format_plural($data['users'][1],
+    'The site has <strong>one active user</strong>',
+    'The site has <strong>@count active users</strong>');
+  $output .= format_plural($data['users'][0],
+    ' and one blocked user.',
+    ' and @count blocked users.');
+  $output .= '</p>';
+  return $output;
+}
+
+/**
+ * Summary data for Modules section (admin/modules).
+ */
+function xray_modules_summary() {
+  $data = array();
+  $result = db_query("SELECT status, COUNT(*) FROM {system} WHERE type = 'module' GROUP BY status")
+    ->fetchAllKeyed();
+  $data['modules_by_status'] = $result;
+  return $data;
+}
+
+/**
+ * Returns HTML text summary of Modules section (admin/modules) data.
+ *
+ * @param $attributes
+ *   (optional) An associative array of HTML tag attributes, suitable for
+ *   flattening by drupal_attributes().
+ * @param $variables
+ *   An associative array containing:
+ *   - data: result of xray_modules_summary().
+ *
+ * @ingroup themeable
+ */
+function theme_xray_modules_summary($variables) {
+  $data = $variables['data'];
+  // Collapse attributes for paragraph tag to a string.
+  $attr = drupal_attributes($variables['attributes']);
+
+  $output = '';
+  $output .= "<p $attr>";
+  $output .= t('This site has <strong>@enabled_count enabled modules</strong> (and an additional @disabled_count modules present but not enabled).',
+    array('@enabled_count' => $data['modules_by_status'][1],
+          '@disabled_count' => $data['modules_by_status'][0])
+  );
+  $output .= '</p>';
+  return $output;
+}
+
+/**
+ * Fetch the total number of blocks available on the Drupal site.
+ */
+function xray_stats_block_total() {
+  // Get count of total blocks.  All blocks are repeated for each theme, so we
+  // want to limit this count to just one theme (it could be any theme).
+  return db_select('block')
+    ->fields('block')
+    ->condition('theme', variable_get('theme_default', 'bartik'))
+    ->countQuery()
+    ->execute()
+    ->fetchField();
+}
+
+/**
+ * Fetch the number of blocks enabled per theme.
+ */
+function xray_stats_blocks_enabled_by_theme() {
+  $query = db_select('block')
+    ->fields('block', array('theme'))
+    ->condition('status', 1, '=');
+  $count_alias = $query->addExpression('COUNT(bid)', 'num');
+  $result = $query
+    ->groupBy('theme')
+    ->execute()
+    ->fetchAllKeyed();
+  return $result;
+} 
+
+/**
+ * Fetch content type statistics.
+ */
+function xray_stats_content_type_total() {
+  return db_query("SELECT COUNT(*) FROM {node_type}")->fetchField();
+}
+
+/**
+ * Fetch information about themes.
+ */
+function xray_stats_enabled_themes() {
+  $themes = list_themes();
+  $num_themes = count($themes);
+  // Initialize variables for the data we will collect.
+  $num_hidden = 0; // Number of hidden themes.
+  $num_enabled = 0;
+  $summaries = array();
+  // Iterate through each theme, gathering data that we care about.
+  foreach ($themes as $themename => $theme) {
+    // Remove hidden themes, but keep a count of them.
+    if (isset($theme->info['hidden']) && $theme->info['hidden']) {
+      $num_hidden++;
+//      unset($themes[$themename]);
+    }
+    else {  // This is a visible theme, provide more stats.
+      if ($theme->status) {
+        $num_enabled++;
+      }
+      $summaries[$theme->info['name']] = array(
+        'regions' => count($theme->info['regions']),
+        'overlay_regions' => count($theme->info['overlay_regions']),
+        'regions_hidden' => count($theme->info['regions_hidden']),
+        'features' => count($theme->info['features']),
+        'kindsofstylesheets' => count($theme->info['stylesheets']),
+        'allstylesheets' => isset($theme->info['stylesheets']['all']) ? count($theme->info['stylesheets']['all']) : 0,
+      );
+    }
+  }
+  return compact('num_themes', 'num_hidden', 'num_enabled', 'summaries');
+}
+
+/**
+ * Display the page callback function (and other router item information).
+ */
+function xray_show_page_callback() {
+  // Do not hand in the path; menu_get_item() finds dynamic paths on its own
+  // but fails if handed help's $path variable which is node/% for node/1.
+  $router_item = menu_get_item();
+  // menu_get_item() can return null when called via drush command line.
+  if ($router_item) {
+    return theme('xray_show_page_callback', $router_item);
+  }
+}
+
+/**
+ * Process variables for show page callback theme function.
+ */
+function template_preprocess_xray_show_page_callback(&$variables) {
+  if ($variables['page_arguments']) {
+    foreach ($variables['page_arguments'] as $key => $value) {
+      // Arrays and objects can't be easily printed in a message, so instead
+      // identify what they are.
+      if (is_array($value)) {
+        $value = t('array') . ' ' . $key;
+      }
+      elseif (is_object($value)) {
+        $value = t('object') . ' ' . $key;
+      }
+      // Sanitize for security and add emphasis to each argument.
+      $variables['page_arguments'][$key] = drupal_placeholder($value);
+    }
+  }
+}
+
+/**
+ * Theme the page callback and optionally other elements of a router item.
+ *
+ * @param $variables
+ *   An associative array, typically generated by menu_get_item(), containing:
+ *   - page_callback: The page callback function called to display a web page.
+ *   - page_arguments: (optional) An array of arguments passed to the page
+ *     callback function.
+ *   - include_file: (optional) A file included before the page callback is
+ *     called; this allows the page callback function to be in a separate file.
+ *
+ * @see template_preprocess_xray_show_page_callback()
+ *
+ * @ingroup themeable
+ */
+function theme_xray_show_page_callback($variables) {
+  extract($variables, EXTR_SKIP);
+
+  $output = '';
+  $output .= '<p class="xray-help xray-page-callback">';
+  $output .= t('This page is brought to you by ');
+  if ($page_arguments) {
+    $output .= format_plural(count($page_arguments),
+      'the argument !arg handed to ',
+      'the arguments !arg handed to ',
+      array('!arg' => xray_oxford_comma_list($page_arguments))
+    );
+  }
+  $output .= t('the function %func',
+               array('%func' => $page_callback . '()'));
+  if ($include_file) {
+    $output .= t(' and the included file %file',
+                 array('%file' => $include_file));
+  }
+  $output .= '.</p>';
+  return $output;
+}
+
+/**
+ * Make an array of items into a grammatical (comma, and) sentence-ready list.
+ *
+ * Based on http://www.drupaler.co.uk/blog/oxford-comma/503
+ * Grammatically fun helper to make a list of things in a sentence, ie
+ * turn an array into a string 'a, b, and c'.
+ *
+ * @param $list
+ *   An array of words or items to join.
+ * @param $settings
+ *   An array of optional settings to use in making the Oxford comma list:
+ *   - type
+ *     The text to use between the last two items. Defaults to 'and'.  Pass in
+ *     'or' and 'and' without translation; translate any other join.
+ *   - comma
+ *     The join for the list.  Defaults to a comma followed by a space.
+ *     To make an Oxford comma list with semicolons, use '; '.
+ *   - oxford
+ *     Change this from default 'TRUE' and you are a philistine.
+ */
+function xray_oxford_comma_list($list, $settings = array()) {
+  $default_settings = array(
+    'comma' => ', ',
+    'type' => 'and',
+    'oxford' => TRUE,
+  );
+  $settings = array_merge($default_settings, $settings);
+  extract($settings, EXTR_SKIP);
+  if ($type == 'and') {
+    $type = t('and', array(), array('context' => 'Final join'));
+  }
+  elseif ($type == 'or') {
+    $type = t('or', array(), array('context' => 'Final join'));
+  }
+  // If it is a listing of more than two and the Oxford comma setting is as the
+  // Queen intended, include the comma (or other separator) in the final join.
+  if ($oxford && count($list) > 2) {
+    $final_join = $comma . $type . ' ';
+  }
+  else {
+    $final_join = ' ' . $type . ' ';
+  }
+  // Take the last two elements off of the $list array.
+  $final = array_splice($list, -2, 2);
+  // Combine the final two removed elements around the final join string.
+  $final_string = implode($final_join, $final);
+  // Add the combined elements (now a single element) back onto the list array.
+  array_push($list, $final_string);
+  // Return the list as a text string joined together with commas (or other).
+  return implode($comma, $list);
+}

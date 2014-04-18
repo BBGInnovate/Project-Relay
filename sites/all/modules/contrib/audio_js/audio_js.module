@@ -1,0 +1,248 @@
+<?php
+/**
+ * @file
+ * This is the main script for the audio.js module. It merely 
+ * contains the implementation of hooks invoked by Drupal core.
+ */
+
+/**
+ * Implements hook_help().
+ */
+function audio_js_help($path, $arg) {
+  switch ($path) {
+    // Main module help for the Field Permissions module.
+    case 'admin/help#audio_js':
+      return '<p>' . t('The audio.js module uses the native HTML5 audio tag where available and an invisible flash player to emulate audio tag for other browsers. It provides a consistent html player UI to all browsers which can be styled with custom css. You must first download the audio.js library !audio_js then extract the audiojs archive and copy the contents into your Drupal libraries directory, so that the audio.min.js file can be found at %path. To use the player go to your content types display settings select audio.js or audio.js playlist as you field format.', array(
+          '!audio_js' => l(t('http://kolber.github.com/audiojs/'), 'http://kolber.github.com/audiojs/'),
+          '%path' => 'libraries/audiojs/audio.min.js')) .
+      '</p>';
+  }
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function audio_js_field_formatter_info() {
+  return array(
+    'audio_js' => array(
+      'label' => t('audio.js'),
+      'field types' => array('file'),
+      'settings'  => array(
+        'audio_js_preload' => 0,
+        'audio_js_autoplay' => 0,
+        'audio_js_loop' => 0,
+        'audio_js_style' => 'default',
+      ),
+    ),
+    'audio_js_playlist' => array(
+      'label' => t('audio.js playlist'),
+      'field types' => array('file'),
+      'settings'  => array(
+        'audio_js_preload' => 0,
+        'audio_js_autoplay' => 0,
+        'audio_js_loop' => 1,
+        'audio_js_style' => 'default',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function audio_js_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  // Get the view_mode where our settings are stored.
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $display_type = $display['type'];
+
+  // Initialize the element variable.
+  $element = array();
+  $element['audio_js_preload'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Preload'),
+    '#description' => t('Begin preloading the file when the page loads.'),
+    '#default_value' => $settings['audio_js_preload'],
+  );
+  $element['audio_js_autoplay'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Autoplay'),
+    '#description' => t('Begin playing automatically when the page loads.'),
+    '#default_value' => $settings['audio_js_autoplay'],
+  );
+  $element['audio_js_loop'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Loop'),
+    '#description' => t('Loop playback'),
+    '#default_value' => $settings['audio_js_loop'],
+  );
+  $element['audio_js_style'] = array(
+    '#type' => 'select',
+    '#title' => t('Style'),
+    '#options' => array(
+      'default' => 'Default',
+      'none' => 'None',
+      'mini' => 'Mini',
+    ),
+    '#description' => t('None will remove all styling; you will need to add custom css in order for it to be usable.'),
+    '#default_value' => $settings['audio_js_style'],
+  );
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function audio_js_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $display_type = $display['type'];
+  $preload_setting = ($settings['audio_js_preload'] ? 'true' : 'false');
+  $summary = t('Preload: @setting', array('@setting' => $preload_setting)) . '<br />';
+  $autoplay_setting = ($settings['audio_js_autoplay'] ? 'true' : 'false');
+  $summary .= t('Autoplay: @setting', array('@setting' => $autoplay_setting)) . '<br />';
+  $loop_setting = ($settings['audio_js_loop'] ? 'true' : 'false');
+  $summary .= t('Loop: @setting', array('@setting' => $loop_setting)) . '<br />';
+  $style_setting = check_plain($settings['audio_js_style']);
+  $summary .= t('Style: @setting', array('@setting' => $style_setting)) . '<br />';
+  return $summary;
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function audio_js_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  $settings = $display['settings'];
+
+  // Include main audio.js library.
+  if (module_exists('libraries')) {
+    $audiojs_path = libraries_get_path('audiojs');
+    $audio_library = $audiojs_path . "/audiojs/audio.min.js";
+    drupal_add_js($audio_library, 'file');
+  }
+  $module_path = drupal_get_path('module', 'audio_js');
+  $css_style = check_plain($settings['audio_js_style']);
+  drupal_add_css($module_path . '/css/audio_js_' . $css_style . '.css');
+
+  switch ($display['type']) {
+    case 'audio_js':
+      foreach ($items as $delta => $item) {
+        $variables = array(
+          'uri' => $item['uri'],
+          'preload' => $settings['audio_js_preload'],
+          'autoplay' => $settings['audio_js_autoplay'],
+          'loop' => $settings['audio_js_loop'],
+          'class' => $css_style,
+        );
+        $file_parts = pathinfo($item['uri']);
+        if($file_parts['extension'] == 'mp3') {
+          $element[$delta]['#markup'] = theme('audio_js_audio_tag', $variables); 
+        }
+      }
+      $settings = array(
+        'swf' => base_path() . $audiojs_path . "/audiojs/audiojs.swf",
+      );
+      if (!empty($items)) {
+        drupal_add_js(array('audio_js' => $settings), 'setting');
+        drupal_add_js($module_path . '/js/audio_js_init.js', 'file');
+      }
+      break;
+
+    case 'audio_js_playlist':
+      $variables = array(
+        'preload' => $settings['audio_js_preload'],
+        'autoplay' => $settings['audio_js_autoplay'],
+        'class' => $css_style,
+      );
+      $element[0]['#markup'] = theme('audio_js_audio_tag_for_playlist', $variables);
+      $list = array();
+      foreach ($items as $delta => $item) {
+        $file_parts = pathinfo($item['uri']);
+        if($file_parts['extension'] == 'mp3') {
+          // If the description is available use that, else use the filename.
+          $label = (!empty($item['description']) ? check_plain($item['description']) : $item['filename']);
+          $list[] = l($label, NULL, array(
+            'attributes' => array('data-src' => file_create_url($item['uri'])),
+            'fragment' => 'audio',
+            'external' => TRUE,
+          ));
+        } else {
+          drupal_set_message("Invalid file type. The audio.js player only supports mp3 files.", "warning");
+        }
+      }
+      $element[0]['#suffix'] = theme('item_list', array(
+        'items' => $list,
+        'title' => '',
+        'type' => 'ol',
+        'attributes' => array('class' => array('audiojs-playlist')),
+      ));
+      $element[0]['#suffix'] .= '</div>';
+      $loop = ($settings['audio_js_loop'] ? TRUE : FALSE);
+      $settings = array(
+        'loop' => $loop,
+        'swf' => base_path() . $audiojs_path . "/audiojs/audiojs.swf",
+      );
+      if (!empty($items)) {
+        drupal_add_js(array('audio_js' => $settings), 'setting');
+        drupal_add_js($module_path . '/js/audio_js_playlist.js', 'file');
+      }
+      break;
+  }
+  return $element;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function audio_js_theme($existing, $type, $theme, $path) {
+  return array(
+    'audio_js_audio_tag' => array(
+      'variables' => array(
+        'uri' => NULL,
+        'preload' => FALSE,
+        'autoplay' => FALSE,
+        'loop' => FALSE,
+        'class' => 'audiojs-default',
+      ),
+    ),
+    'audio_js_audio_tag_for_playlist' => array(
+      'variables' => array(
+        'preload' => FALSE,
+        'autoplay' => FALSE,
+        'class' => 'audiojs-default',
+      ),
+    ),
+  );
+}
+
+/**
+ * Theme for audio_js_audio_tag.
+ */
+function theme_audio_js_audio_tag($variables) {
+  $preload = $variables['preload'] ? 'auto' : 'none';
+  // If autoplay than we need to preload.
+  if ($variables['autoplay']) {
+    $preload = 'auto';
+  }
+  $output = '<div class="audiojs-' . $variables['class'] . '"><audio preload="' . $preload . '" ' .
+  ($variables['autoplay'] ? 'autoplay="autoplay" ' : '') .
+  ($variables['loop'] ? 'loop="loop" ' : '') . '><source src="' . file_create_url($variables['uri']) . '"/></audio></div>';
+
+  return $output;
+}
+
+/**
+ * Theme for audio_js_audio_tag_for_playlist.
+ */
+function theme_audio_js_audio_tag_for_playlist($variables) {
+  $preload = $variables['preload'] ? 'preload' : 'none';
+  // If autoplay than we need to preload.
+  if ($variables['autoplay']) {
+    $preload = 'preload';
+  }
+  $output = '<div class="audiojs-' . $variables['class'] . '"><audio preload="' . $preload . '" ' . ($variables['autoplay'] ? 'autoplay="autoplay" ' : '') .
+  '/></audio>';
+
+  return $output;
+}

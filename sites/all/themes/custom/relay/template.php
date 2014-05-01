@@ -4,7 +4,7 @@
  * Implements template_preprocess_html().
  *
  */
-//function STARTER_preprocess_html(&$variables) {
+//function relay_preprocess_html(&$variables) {
 //  // Add conditional CSS for IE. To use uncomment below and add IE css file
 //  drupal_add_css(path_to_theme() . '/css/ie.css', array('weight' => CSS_THEME, 'browsers' => array('!IE' => FALSE), 'preprocess' => FALSE));
 //
@@ -16,20 +16,20 @@
  * Implements template_preprocess_page
  *
  */
-//function STARTER_preprocess_page(&$variables) {
+//function relay_preprocess_page(&$variables) {
 //}
 
 /**
  * Implements template_preprocess_node
  *
  */
-//function STARTER_preprocess_node(&$variables) {
+//function relay_preprocess_node(&$variables) {
 //}
 
 /**
  * Implements hook_preprocess_block()
  */
-//function STARTER_preprocess_block(&$variables) {
+//function relay_preprocess_block(&$variables) {
 //  // Add wrapping div with global class to all block content sections.
 //  $variables['content_attributes_array']['class'][] = 'block-content';
 //
@@ -69,28 +69,28 @@
 //  }
 //}
 
-//function STARTER_preprocess_views_view(&$variables) {
+//function relay_preprocess_views_view(&$variables) {
 //}
 
 /**
  * Implements template_preprocess_panels_pane().
  *
  */
-//function STARTER_preprocess_panels_pane(&$variables) {
+//function relay_preprocess_panels_pane(&$variables) {
 //}
 
 /**
  * Implements template_preprocess_views_views_fields().
  *
  */
-//function STARTER_preprocess_views_view_fields(&$variables) {
+//function relay_preprocess_views_view_fields(&$variables) {
 //}
 
 /**
  * Implements theme_form_element_label()
  * Use foundation tooltips
  */
-//function STARTER_form_element_label($variables) {
+//function relay_form_element_label($variables) {
 //  if (!empty($variables['element']['#title'])) {
 //    $variables['element']['#title'] = '<span class="secondary label">' . $variables['element']['#title'] . '</span>';
 //  }
@@ -103,7 +103,7 @@
 /**
  * Implements hook_preprocess_button().
  */
-//function STARTER_preprocess_button(&$variables) {
+//function relay_preprocess_button(&$variables) {
 //  $variables['element']['#attributes']['class'][] = 'button';
 //  if (isset($variables['element']['#parents'][0]) && $variables['element']['#parents'][0] == 'submit') {
 //    $variables['element']['#attributes']['class'][] = 'secondary';
@@ -114,7 +114,7 @@
  * Implements hook_form_alter()
  * Example of using foundation sexy buttons
  */
-//function STARTER_form_alter(&$form, &$form_state, $form_id) {
+//function relay_form_alter(&$form, &$form_state, $form_id) {
 //  // Sexy submit buttons
 //  if (!empty($form['actions']) && !empty($form['actions']['submit'])) {
 //    $classes = (is_array($form['actions']['submit']['#attributes']['class']))
@@ -129,7 +129,7 @@
  * Implements hook_form_FORM_ID_alter()
  * Example of using foundation sexy buttons on comment form
  */
-//function STARTER_form_comment_form_alter(&$form, &$form_state) {
+//function relay_form_comment_form_alter(&$form, &$form_state) {
   // Sexy preview buttons
 //  $classes = (is_array($form['actions']['preview']['#attributes']['class']))
 //    ? $form['actions']['preview']['#attributes']['class']
@@ -176,7 +176,7 @@ function THEMENAME_preprocess_views_view_fields(&$variables) {
 /**
  * Implements hook_css_alter().
  */
-//function STARTER_css_alter(&$css) {
+//function relay_css_alter(&$css) {
 //  // Always remove base theme CSS.
 //  $theme_path = drupal_get_path('theme', 'zurb_foundation');
 //
@@ -190,7 +190,7 @@ function THEMENAME_preprocess_views_view_fields(&$variables) {
 /**
  * Implements hook_js_alter().
  */
-//function STARTER_js_alter(&$js) {
+//function relay_js_alter(&$js) {
 //  // Always remove base theme JS.
 //  $theme_path = drupal_get_path('theme', 'zurb_foundation');
 //

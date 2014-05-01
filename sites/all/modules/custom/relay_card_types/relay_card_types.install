@@ -122,7 +122,12 @@ function relay_card_types_uninstall() {
     variable_del( 'relay_vimeo_access_token' );
     variable_del( 'relay_youtube_enabled' );
     variable_del( 'relay_youtube_push_enabled' ); 
-    variable_del( 'relay_youtube_key' );
+    variable_del( 'relay_youtube_username' );
+    variable_del( 'relay_youtube_client_id' );
+    variable_del( 'relay_youtube_client_secret' );
+    variable_del( 'relay_youtube_token' );
+    variable_del( 'relay_youtube_token_secret' );
+    variable_del( 'relay_youtube_oauth_verifier' );
     variable_del( 'relay_sound_cloud_enabled' );
     variable_del( 'relay_sound_cloud_push_enabled' );     
     variable_del( 'relay_sound_cloud_key' );

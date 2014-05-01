@@ -50,9 +50,9 @@ class Google_Auth_OAuth2 extends Google_Auth_Abstract
   private $state;
 
   /**
-   * @var string The token bundle.
+   * @var array The token bundle.
    */
-  private $token;
+  private $token = array();
 
   /**
    * @var Google_Client the base client
@@ -328,17 +328,24 @@ class Google_Auth_OAuth2 extends Google_Auth_Abstract
     }
   }
 
-    /**
-     * Revoke an OAuth2 access token or refresh token. This method will revoke the current access
-     * token, if a token isn't provided.
-     * @throws Google_Auth_Exception
-     * @param string|null $token The token (access token or a refresh token) that should be revoked.
-     * @return boolean Returns True if the revocation was successful, otherwise False.
-     */
+  /**
+   * Revoke an OAuth2 access token or refresh token. This method will revoke the current access
+   * token, if a token isn't provided.
+   * @throws Google_Auth_Exception
+   * @param string|null $token The token (access token or a refresh token) that should be revoked.
+   * @return boolean Returns True if the revocation was successful, otherwise False.
+   */
   public function revokeToken($token = null)
   {
     if (!$token) {
-      $token = $this->token['access_token'];
+      if (!$this->token) {
+        // Not initialized, no token to actually revoke
+        return false;
+      } elseif (array_key_exists('refresh_token', $this->token)) {
+        $token = $this->token['refresh_token'];
+      } else {
+        $token = $this->token['access_token'];
+      }
     }
     $request = new Google_Http_Request(
         self::OAUTH2_REVOKE_URI,
@@ -363,7 +370,7 @@ class Google_Auth_OAuth2 extends Google_Auth_Abstract
    */
   public function isAccessTokenExpired()
   {
-    if (!$this->token) {
+    if (!$this->token || !isset($this->token['created'])) {
       return true;
     }
 

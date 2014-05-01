@@ -3,10 +3,12 @@
 /**
  * Includes the field defentions for content types
  */
-require_once ( dirname(__FILE__) . '/relay_card_types.fields.inc' );
-require_once ( dirname(__FILE__) . '/relay_card_types.libraries.inc' );
-require_once ( dirname(__FILE__) . '/relay_card_types.rules.inc' );
+require_once ( dirname(__FILE__) . '/includes/relay_card_types.fields.inc' );
+require_once ( dirname(__FILE__) . '/includes/relay_card_types.libraries.inc' );
+require_once ( dirname(__FILE__) . '/includes/relay_card_types.rules.inc' );
+require_once ( dirname(__FILE__) . '/includes/relay_card_types.theme.inc' );
 
+//
 function relay_card_types_requirements($phase){
   //
   $requirements = array();
@@ -93,21 +95,19 @@ function relay_card_types_libraries_info() {
   );
 
   //insures the youtube library is installed
-  /*
   $libraries['youtube_api'] = array(
-    'name' => 'Simple library',
-    'vendor url' => 'https://github.com/google/google-api-php-client',
-    'download url' => 'https://github.com/google/google-api-php-client',
+    'name' => 'YouTube API',
+    'vendor url' => 'https://github.com/jimdoescode/Zendless-PHP-YouTube-API',
+    'download url' => 'https://github.com/jimdoescode/Zendless-PHP-YouTube-API',
     'version arguments' => array(
-      'file' => 'simple.js', // Could be any file with version info
-      'pattern' => '/Version (\d+)/',
+      'file' => 'LICENSE', // Could be any file with version info
+      'pattern' => '/Version (\d+\.\d+)/',
       'lines' => 5,
     ),
     'files' => array(
-      'php' => array('simple.js'),
+      'php' => array('src/Google/Client.php', 'src/Google/Service/YouTube.php' ),
     ),
   );
-  */
 
   //insures the sound cloud library is installed
   $libraries['soundcloud_api'] = array(
@@ -141,16 +141,16 @@ function relay_card_types_menu() {
         'page callback' => 'drupal_get_form',
         'page arguments' => array('_relay_card_types_configuration_form'),
         'access arguments' => array('adminster relay'),
-        'file' => 'relay_card_types.admin.inc',
+        'file' => 'includes/relay_card_types.admin.inc',
     );
 
     //
-    $menu['admin/config/system/relay_cron'] = array(
-        'title' => 'Run Relay Cron',
-        'description' => 'Run cron for Relay',
-        'page callback' => 'drupal_get_form',
+    $menu['admin/config/system/relay/youtube_authorize'] = array(
+        'title' => 'Authorize YouTube',
+        'description' => 'Captures YouTube Authorization',
+        'page callback' => '_relay_card_types_youtube_authorization',
         'access arguments' => array('adminster relay'),
-        'file' => 'relay_card_types.admin.inc',
+        'file' => 'includes/relay_card_types.admin.inc',
     );
 
     //
@@ -466,8 +466,6 @@ function relay_card_types_taxonomy_vocabulary_insert($vocabulary) {
 
    //save the default taxonomy term id
    variable_set( 'relay_default_event', $term->tid );
-
-
   }
 }
 

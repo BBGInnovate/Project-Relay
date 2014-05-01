@@ -9,19 +9,11 @@
       <?php if ($top_bar_classes): ?>
       <div class="<?php print $top_bar_classes; ?>">
       <?php endif; ?>
-        <nav class="top-bar"<?php print $top_bar_options; ?>>
+        <nav class="top-bar" data-topbar <?php print $top_bar_options; ?>>
           <ul class="title-area">
-            <li class="name"><h1><?php print $linked_site_name; ?></h1></li>
+            <li class="name"><h1><span class="left"><a href="<?php print $front_page; ?>"><img src="/<?php print path_to_theme(); ?>/images/VOA-white.png" alt="VOA logo" /></a></span><span class="left cs_white logo-text"><?php print $linked_site_name; ?></span></h1></li>
             <li class="toggle-topbar menu-icon"><a href="#"><span><?php print $top_bar_menu_text; ?></span></a></li>
           </ul>
-          <section class="top-bar-section">
-            <?php if ($top_bar_main_menu) :?>
-              <?php print $top_bar_main_menu; ?>
-            <?php endif; ?>
-            <?php if ($top_bar_secondary_menu) :?>
-              <?php print $top_bar_secondary_menu; ?>
-            <?php endif; ?>
-          </section>
         </nav>
       <?php if ($top_bar_classes): ?>
       </div>
@@ -122,7 +114,7 @@
 
       <a id="main-content"></a>
 
-      <?php if ($breadcrumb): print $breadcrumb; endif; ?>
+        <!--/.<?php if ($breadcrumb): print $breadcrumb; endif; ?> -->
 
       <?php if ($title && !$is_front): ?>
         <?php print render($title_prefix); ?>

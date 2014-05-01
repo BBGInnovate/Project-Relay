@@ -24,14 +24,13 @@
  * - http://smacss.com/
  */
 
+// Make sure the charset is set appropriately
+@charset "UTF-8";
 
 // Core
 // The following imports bootstrap the theme.
 // You may comment out bourbon if you don't want to use its library of mixins.
 // The theme will have compilation errors if Foundation is not imported.
-
-// Make sure the charset is set appropriately
-@charset "UTF-8";
 
 // Global Zurb Foundation variables.
 @import "vendor/foundation/variables";
@@ -42,10 +41,6 @@
 // Comment out this import if you don't want to use Bourbon, a replacement for Compass mixins.
 @import "bourbon";
 
-// Base
-// Init file contains required imports. Here's where we include normalize,
-// and Foundation 5.
-@import "base/init";
 
 // Import our mixins early so they can be used by other partials.
 // Optional.

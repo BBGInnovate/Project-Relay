@@ -1,5 +1,5 @@
 name = Relay Theme
-description = Relay is a custom sub-theme based on the the Zurb Foundation base theme.
+description = Relay Theme is a custom sub-theme based on the the Zurb Foundation base theme.
 screenshot = images/screenshot.png
 
 core = 7.x
@@ -29,7 +29,7 @@ base theme = zurb_foundation
 ; For CSS users, load the app.css file:
 stylesheets[all][] = css/app.css
 ; Comment the app.css file (above) if you're using sass to preprocess css:
-;stylesheets[all][] = css/STARTER.css
+;stylesheets[all][] = css/relay.css
 
 ; Block loading of foundation.min.css from the base theme. This file should either
 ; not exist or be blank in your subtheme. See https://drupal.org/node/263967

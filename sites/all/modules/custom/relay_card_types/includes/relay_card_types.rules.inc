@@ -969,8 +969,10 @@ function _relay_card_types_create_video( $message, $author, $published, $pushed=
   $card->type = 'relay_video';
 
   //store the youtube id if we need too
-  $card->relay_youtube_code[$card->language][0]['value'] = $message->relay_youtube_code == null ? '' : $message->relay_youtube_code;
-  $card->relay_youtube_code[$card->language][0]['format'] = null;
+  if( $pushed ){
+    $card->relay_youtube_code[$card->language][0]['value'] = $message->relay_youtube_code == null ? '' : $message->relay_youtube_code;
+    $card->relay_youtube_code[$card->language][0]['format'] = null;
+  }
 
   //determine if we have an attachment that meets our qualifications
   if( !$pushed ){
@@ -1013,6 +1015,7 @@ function _relay_card_types_create_video( $message, $author, $published, $pushed=
 
     //
     $card->relay_youtube_code[$card->language][0]['value'] = $youtube_code; //capture the youtube code
+    $card->relay_youtube_code[$card->language][0]['format'] = null;
 
     ////// These next lines replace the downloaded video with the YouTube embed.  Not sure I concur with this
     ////// I think I would rather have both live together vs only supporting one video type.

@@ -1,0 +1,139 @@
+body {text-align:left;}
+.page {background-color:transparent; margin:0 auto; max-width:1000px; width:100%;}
+.page-top-bg {background:url('../images/page-outline-bkgd.gif') repeat-x 0 0; width:100%; height: 82px; left: 0;
+    position: fixed; top: 0; width:100%; z-index:-1000;}
+
+/* Custom Colors */
+.cs_bg_grey {
+    background-color: #f2f2f2;
+}
+
+.cs_bg_light_grey {
+    background-color: #666666;
+}
+
+.cs_bg_med_grey {
+    background-color: #404040;
+}
+
+.cs_bg_blue {
+    background-color: #102151;
+}
+
+.cs_bg_white {
+    background-color: #ffffff;
+}
+
+.cs_white {
+    color: #ffffff;
+}
+
+.cs_link {
+    color: #008cba;
+}
+
+.cs_padding_sml {
+    padding: .75em;
+}
+
+/*Social Media Icons*/
+.ticker p {font-size:0.8em; padding: 5px 0 0 17px;}
+.ticker p .alert.label {background-color: #0040A4; color: #FFFFFF; font-weight: bold; letter-spacing: 0.05rem;}
+.ticker p {color:#ffffff;}
+
+/*Article Footer Section*/
+.footer-content {background-color:#666666; padding:1.4% 2% 2%;}
+.footer-content h2 a {color:#ffffff; font-size:1.75em; font:1.75rem georgia, "New York Times", serif;}
+.footer-content .card_social  {font-size:2.2em; font-size:2rem;}
+.footer-content .card_social  a {color:#ffffff; text-decoration:none;}
+.footer-content .card_social  a:hover {color:#102151;}
+
+.media-content {overflow:hidden; position:relative;}
+/*.media-content-ftr {background-color:#eeeeee; position:absolute; bottom:0; height:34px; width:100%;}*/
+.media-content .text-secondary p {display:none;}
+
+.flex-video.widescreen {margin-bottom:0px;}
+.flex-video {padding-top:0px;}
+
+.card_follow_live {display: block; margin: 50px 2px 0 0; text-align: right;}
+.card_follow_live a {color:#ffffff;}
+.card_follow_live a:hover {color:#102151;}
+
+nav.top-bar .name h1 a {font-weight: normal; color: white; display: block; margin: -2px 0 0 0; padding: 0 3px 0 17px;}
+
+.top-bar {background-color:#fff;}
+.top-bar .logo-text {padding-top:2px;}
+.top-bar .logo-text a.active {color: #1D4495; font-family: georgia; font-size: 24px; font-weight: bold; padding: 0 3px;}
+.top-bar .logo {height:20px;}
+.top-bar .logo-text a.active {color:#1d4495; padding:1px 3px 0;}
+.l-header .social {background-color:#666666; height:32px; position:relative; z-index:100000;}
+
+.fa-twitter:before {font-size:0.9em;}
+.fa-twitter:before {color:default;}
+
+.fa-twitter:before, .fa-facebook:before, .fa-github:before, .fa-question:before{
+    margin: 0 0 0 -4px;
+}
+.fa-twitter:before {
+    content: "\f099";
+}
+.fa-facebook:before {
+    content: "\f09a";
+}
+.fa-github:before {
+    content: "\f09b";
+}
+.fa {display: inline-block; font-family: FontAwesome; font-style: normal; font-weight: normal; line-height: 1;}
+.fa-bell:before {content: "";}
+
+/* Icons - Header Area */
+.fa.fa-2x {margin: 9px 13px 10px;}
+
+/* Lists Start Here */
+.top-bar-section li:not(.has-form) a:not(.button), .top-bar-section li:not(.has-form) a:not(.button), .top-bar-section ul li > a {
+    line-height:0px !important;
+    padding:0px !important;
+}
+.top-bar-section li:not(.has-form) a:not(.button), .top-bar-section li:not(.has-form) a:not(.button) .fa-2x:before {
+    background-color: #ffffff !important;
+    color: #0040A4;
+}
+.top-bar-section li.active:not(.has-form) a:not(.button), .top-bar-section li.active:not(.has-form) a:not(.button) .fa-2x:before {
+    background-color: #0040a4 !important;
+    color: #ffffff;
+}
+.top-bar-section li:not(.has-form) a:hover, .top-bar-section li:not(.has-form) a:hover .fa-2x:before {
+    background-color: #102151 !important;
+    color: #ffffff;
+}
+.top-bar-section li.active:not(.has-form) a:hover, .top-bar-section li.active:not(.has-form) a:hover .fa-2x:before {
+    background-color: #102151 !important;
+    color: #ffffff;
+}
+li.active > a {
+    background-color:#0040a4;
+}
+
+section .small-12.column.cs_bg_blue.card_top_row {background-color:#102151; margin:2px 0 0 0; padding: 1em;}
+section .card_top_row > .spotlight, .card_pastevents_row {color:#ffffff; font-weight: bold; letter-spacing: 0.05em; text-transform: uppercase;}
+
+section.photo p {margin-bottom: 0;}
+
+#badge {background: none repeat scroll 0 0 #FFFFFF; border: 1px solid #666666; border-radius: 9px; box-shadow: 0 1px rgba(255, 255, 255, 0.3) inset, 0 1px 1px rgba(0, 0, 0, 0.08);
+    color: #0040A4; content: attr(data-count); display: block; font-size: 0.8em; font-weight: bold; height: 18px; padding: 2px; position: absolute; right: 4px;
+    text-align: center; top: 6px; width: 18px;|
+
+article {clear:both;}
+
+.body.text-secondary {
+    position: relative;
+    top: -77px !important;
+    z-index: -100;
+}
+
+.node-title  {
+    clear: both;
+    position: relative;
+    top: 76%;
+    z-index: -96;
+}

@@ -119,6 +119,15 @@ section .card_top_row > .spotlight, .card_pastevents_row {color:#ffffff; font-we
 
 section.photo p {margin-bottom: 0;}
 
+section.relay_article {}
+section.relay_audio {}
+section.relay_editorial {}
+section.relay_live {}
+section.relay_msg_src {}
+section.relay_photo {}
+section.relay_tweet {}
+section.relay_video {}
+
 #badge {background: none repeat scroll 0 0 #FFFFFF; border: 1px solid #666666; border-radius: 9px; box-shadow: 0 1px rgba(255, 255, 255, 0.3) inset, 0 1px 1px rgba(0, 0, 0, 0.08);
     color: #0040A4; content: attr(data-count); display: block; font-size: 0.8em; font-weight: bold; height: 18px; padding: 2px; position: absolute; right: 4px;
     text-align: center; top: 6px; width: 18px;|

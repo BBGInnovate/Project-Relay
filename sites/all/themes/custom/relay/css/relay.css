@@ -2,6 +2,8 @@ body {text-align:left;}
 .page {background-color:transparent; margin:0 auto; max-width:1000px; width:100%;}
 .page-top-bg {background:url('../images/page-outline-bkgd.gif') repeat-x 0 0; width:100%; height: 82px; left: 0;
     position: fixed; top: 0; width:100%; z-index:-1000;}
+	
+.test {}
 
 /* Custom Colors */
 .cs_bg_grey {

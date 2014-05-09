@@ -1,6 +1,5 @@
 <!--.page -->
 <style>
-
 .page .l-header {background-color: #fff; max-width: 1000px; padding-bottom:2px; position: fixed; width: 100%;
     z-index:500;}
 .page main {padding-top:73px !important;}

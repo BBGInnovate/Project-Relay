@@ -112,11 +112,6 @@
 			  <a href="#"><i class="fa fa-twitter"></i></a>
 			  <a href="#"><i class="fa fa-google-plus-square"></i></a>
 		  </span>
-            <span class="right"><a href="#"><i class="fa fa-comment"></i></a></span>
         </div>
-        <p class="card_follow_live"><a href="#">Follow our live coverage <i class="fa fa-chevron-circle-right"></i></a></p>
-
-        <!--< ?php print render($content['links']); ?>  Commented out by Rob McIntosh - May 6th-->
-        <!--< ?php print render($content['comments']); ?>  Commented out by Rob McIntosh - May 6th-->
     </section>
 </article>

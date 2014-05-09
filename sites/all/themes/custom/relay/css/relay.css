@@ -91,7 +91,7 @@ nav.top-bar .name h1 a {font-weight: normal; color: white; display: block; margi
 .fa-bell:before {content: "";}
 
 /* Icons - Header Area */
-.fa.fa-2x {margin: 9px 13px 10px;}
+.fa.fa-2x {margin: 9px 13px 11px;}
 
 /* Lists Start Here */
 .top-bar-section li:not(.has-form) a:not(.button), .top-bar-section li:not(.has-form) a:not(.button), .top-bar-section ul li > a {

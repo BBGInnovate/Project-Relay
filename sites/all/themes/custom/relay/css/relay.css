@@ -1,9 +1,15 @@
 body {text-align:left;}
+
+article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
+	clear:none;;
+}
+article, section {
+	overflow:hidden;	
+}
+
 .page {background-color:transparent; margin:0 auto; max-width:1000px; width:100%;}
-.page-top-bg {background:url('../images/page-outline-bkgd.gif') repeat-x 0 0; width:100%; height: 82px; left: 0;
+.page-top-bg {background:url('../images/page-outline-bkgd.png') repeat-x 0 0; width:100%; height: 82px; left: 0;
     position: fixed; top: 0; width:100%; z-index:-1000;}
-	
-.test {}
 
 /* Custom Colors */
 .cs_bg_grey {
@@ -57,10 +63,6 @@ body {text-align:left;}
 .flex-video.widescreen {margin-bottom:0px;}
 .flex-video {padding-top:0px;}
 
-.card_follow_live {display: block; margin: 50px 2px 0 0; text-align: right;}
-.card_follow_live a {color:#ffffff;}
-.card_follow_live a:hover {color:#102151;}
-
 nav.top-bar .name h1 a {font-weight: normal; color: white; display: block; margin: -2px 0 0 0; padding: 0 3px 0 17px;}
 
 .top-bar {background-color:#fff;}
@@ -68,7 +70,7 @@ nav.top-bar .name h1 a {font-weight: normal; color: white; display: block; margi
 .top-bar .logo-text a.active {color: #1D4495; font-family: georgia; font-size: 24px; font-weight: bold; padding: 0 3px;}
 .top-bar .logo {height:20px;}
 .top-bar .logo-text a.active {color:#1d4495; padding:1px 3px 0;}
-.l-header .social {background-color:#666666; height:32px; position:relative; z-index:100000;}
+.l-header .social {background-color:#666666; height:32px; position:relative; z-index:100000; width:100%;}
 
 .fa-twitter:before {font-size:0.9em;}
 .fa-twitter:before {color:default;}
@@ -132,7 +134,7 @@ section.relay_video {}
 
 #badge {background: none repeat scroll 0 0 #FFFFFF; border: 1px solid #666666; border-radius: 9px; box-shadow: 0 1px rgba(255, 255, 255, 0.3) inset, 0 1px 1px rgba(0, 0, 0, 0.08);
     color: #0040A4; content: attr(data-count); display: block; font-size: 0.8em; font-weight: bold; height: 18px; padding: 2px; position: absolute; right: 4px;
-    text-align: center; top: 6px; width: 18px;|
+    text-align: center; top: 6px; width: 18px;}
 
 article {clear:both;}
 

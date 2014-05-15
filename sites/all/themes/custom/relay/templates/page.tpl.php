@@ -20,7 +20,7 @@
         <div class="<?php print $top_bar_classes; ?>">
       <?php endif; ?>
       <nav class="top-bar" data-topbar <?php print $top_bar_options; ?>>
-        <ul class="title-area">
+        <ul class="title-area cs_bg_white">
 				<li class="name"><h1><span class="left"><a href="<?php print $front_page; ?>"><img src="/<?php print path_to_theme(); ?>/images/VOA-blue-official.png" class="logo" alt="VOA logo" /></a></span><span class="left cs_white logo-text"><?php print $linked_site_name; ?></span></h1></li>
           <li class="toggle-topbar menu-icon"><a href="#"><span><?php print $top_bar_menu_text; ?></span></a></li>
         </ul>

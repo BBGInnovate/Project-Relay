@@ -1,13 +1,19 @@
 <!--.page -->
-<style>
-.page .l-header {background-color: #fff; max-width: 1000px; padding-bottom:2px; position: fixed; width: 100%;
-    z-index:500;}
-.page main {padding-top:73px !important;}
-.posted {background-color:#000000 !important;} /*Helps to conceal the article text -- Wont work when in relay.css? */
-.posted span {color:#000000 !important;} /*Hides the text thats in there*/
-.pagination-centered {display:none;}
-.fa-twitter:before, .ticker p {color:none !important;}
-</style>
+<?php
+// Determine Event Name and Event ID
+$nid = 2;
+$node = node_load($nid);
+$result = field_view_field('node', $node, 'relay_events_ref', array('default'));
+$eventName =  $result['#object']->relay_events_ref['und'][0]['taxonomy_term']->name;
+
+// Setup Social Sharing Code
+Global $base_url;
+$base_url;
+$facebookShare =  'http://www.facebook.com/sharer.php?u=' . $base_url . '&t=' . $eventName;
+$twitterShare =  'http://twitter.com/intent/tweet?source=sharethiscom&text=' . $eventName . '&url=' . $base_url;
+$googleShare =  'https://plus.google.com/share?url=' . $base_url;
+?>
+
 <div class="page-top-bg"></div>
 <div role="document" class="page">
 
@@ -26,16 +32,18 @@
         </ul>
 			  <section class="top-bar-section cs_bg_white">
 				<ul class="right">
-				  <li><a href="#"><i class="fa fa-facebook-square fa-2x"></i></a></li>
-				  <li><a href="#"><i class="fa fa-twitter fa-2x"></i></a></li>
-				  <li><a href="#"><i class="fa fa-google-plus fa-2x"></i></a></li>
+				  <li><a href="<?php print $facebookShare ?>"><i class="fa fa-facebook-square fa-2x"></i></a></li>
+				  <li><a href="<?php print $twitterShare ?>"><i class="fa fa-twitter fa-2x"></i></a></li>
+				  <li><a href="<?php print $googleShare ?>"><i class="fa fa-google-plus fa-2x"></i></a></li>
 				  <li class="active"><a href="#"><i class="fa fa-question fa-2x"></i></a></li>
 				</ul>
 			  </section>
       </nav>
 			<section class="social">
 				<div class="small-12 ticker">
-				    <p><i class="fa fa-twitter"></i> Follow the Conversation with <a href="#" class="alert label">#eventHashTag</a></p>
+				    <p><i class="fa fa-twitter"></i> Follow the Conversation with <a href="#"
+                        class="alert
+				    label">#eventHashTag</a></p>
 				</div>
 			</section>
       <?php if ($top_bar_classes): ?>

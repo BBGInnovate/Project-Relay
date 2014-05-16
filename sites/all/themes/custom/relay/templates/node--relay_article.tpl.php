@@ -75,16 +75,40 @@
  * @see template_process()
  */
 ?>
+
+<?php
+if (drupal_is_front_page()) {
+    $cs_title = 'Live Now';
+    $nid = 2;
+    $node = node_load($nid);
+    $result = field_view_field('node', $node, 'relay_events_ref', array('default'));
+    $cs_eventurl =  '/event/' . $result['#object']->relay_events_ref['und'][0]['taxonomy_term']->tid;
+} else {
+    $nid = 2;
+    $node = node_load($nid);
+    $result = field_view_field('node', $node, 'relay_events_ref', array('default'));
+    $cs_title =  $result['#object']->relay_events_ref['und'][0]['taxonomy_term']->name;
+    $cs_eventurl =  $node_url;
+}
+?>
+
 <article id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?>"<?php print $attributes; ?>>
 
     <section>
-        <div class="small-12 column cs_bg_blue card_top_row"> <span class="left spotlight"><i class="fa fa-bolt"></i> <a href="<?php print $node_url; ?>" class="cs_white">Current Events</a></span><span class="right"><a data-reveal-id="alert_modal" class="cs_white" href="#">Get Alerts</a> <a data-refresh-events="" class="cs_white" href="#"><i class="fa fa-bell"></i><div data-count="2" id="badge">3</div></a>
+        <div class="small-12 column cs_bg_blue card_top_row"> <span class="left spotlight"><i class="fa fa-bolt"></i> <a href="<?php print $cs_eventurl; ?>" class="cs_white"><?php print $cs_title; ?></a></span><span class="right"><a data-reveal-id="alert_modal" class="cs_white" href="#">Get Alerts</a> <a data-refresh-events="" class="cs_white" href="#"><i class="fa fa-bell"></i><div data-count="2" id="badge">3</div></a>
 	</span></div>
     </section>
 
     <section class="cs_main relay_article">
         <?php
         // We hide the comments and links now so that we can render them later.
+        hide($content['title']);
+        hide($content['relay_pin_card']);
+        hide($content['relay_authors']);
+        hide($content['relay_events_ref']);
+        hide($content['relay_addthis']);
+        hide($content['relay_tweet_status_id']);
+        hide($content['relay_more_link']);
         hide($content['comments']);
         hide($content['links']);
         hide($content['field_tags']);
@@ -93,18 +117,8 @@
     </section>
 
     <section class="footer-content">
-        <?php print render($title_prefix); ?>
-        <?php if (!$page): ?>
-            <?php if (!$page): ?>
-                <h2<?php print $title_attributes; ?>><a href="<?php print $node_url; ?>"><?php print $title; ?></a></h2>
-            <?php endif; ?>
-        <?php endif; ?>
-        <?php print render($title_suffix); ?>
 
-
-        <?php if (!empty($content['field_tags']) && !$is_front): ?>
-            <?php print render($content['field_tags']) ?>
-        <?php endif; ?>
+        <h2<?php print $title_attributes; ?>><a href="<?php print $node_url; ?>"><?php print $title; ?></a></h2>
 
         <div class="card_social light">
 		  <span class="left">

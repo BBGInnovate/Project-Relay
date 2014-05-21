@@ -117,7 +117,7 @@ if (drupal_is_front_page()) {
 
     <section class="footer-content">
 
-        <h2<?php print $title_attributes; ?>><a href="<?php print $node_url; ?>">Title: <?php print $title; ?></a></h2>
+        <h2<?php print $title_attributes; ?>><a href="<?php print $node_url; ?>"><?php print $title; ?></a></h2>
 
         <?php
         $items = field_get_items('node', $node, 'relay_authors');

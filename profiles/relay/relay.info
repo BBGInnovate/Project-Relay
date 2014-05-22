@@ -50,6 +50,7 @@ dependencies[] = uuid
 dependencies[] = uuid_features
 dependencies[] = videojs
 dependencies[] = views
+dependencies[] = views_content
 dependencies[] = views_infinite_scroll
 dependencies[] = views_slideshow
 dependencies[] = vscc

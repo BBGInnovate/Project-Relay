@@ -62,8 +62,6 @@
  *
  * @see theme()
  * @see hook_theme()
- * @see hooks
- * @see callbacks
  *
  * @} End of "defgroup themeable".
  */

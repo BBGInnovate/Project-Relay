@@ -244,7 +244,13 @@ function node_field_display_node_alter(&$display, $context) {
 }
 
 /**
- * Implements callback_entity_info_uri().
+ * Entity URI callback.
+ *
+ * @param $node
+ *   A node entity.
+ *
+ * @return array
+ *   An array with 'path' as the key and the path to the node as its value.
  */
 function node_uri($node) {
   return array(
@@ -1179,8 +1185,10 @@ function node_save($node) {
     module_invoke_all('node_' . $op, $node);
     module_invoke_all('entity_' . $op, $node, 'node');
 
-    // Update the node access table for this node.
-    node_access_acquire_grants($node);
+    // Update the node access table for this node. There's no need to delete
+    // existing records if the node is new.
+    $delete = $op == 'update';
+    node_access_acquire_grants($node, $delete);
 
     // Clear internal properties.
     unset($node->is_new);
@@ -1585,9 +1593,6 @@ function node_permission() {
     ),
     'access content overview' => array(
       'title' => t('Access the content overview page'),
-      'description' => user_access('access content overview')
-        ? t('Get an overview of <a href="@url">all content</a>.', array('@url' => url('admin/content')))
-        : t('Get an overview of all content.'),
     ),
     'access content' => array(
       'title' => t('View published content'),

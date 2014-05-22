@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Relay Default Content feature.
+ */
+
+include_once 'relay_default_content.features.inc';

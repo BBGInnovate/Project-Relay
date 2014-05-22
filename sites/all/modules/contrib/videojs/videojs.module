@@ -1,0 +1,413 @@
+<?php
+/**
+ * @file
+ * Provides an HTML5-compatible with Flash-fallback video player.
+ *
+ * This module provides functionality for loading the Video.js library and
+ * formatters for CCK FileFields.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function videojs_menu() {
+  $items = array();
+
+  $items['admin/config/media/videojs'] = array(
+    'title' => 'Video.js',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('videojs_settings_form'),
+    'access arguments' => array('administer site configuration'),
+    'description' => 'Configure the settings for the Video.js module.',
+    'file' => 'includes/videojs.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function videojs_theme() {
+  return array(
+    'videojs' => array(
+      'variables' => array('items' => NULL, 'player_id' => NULL, 'attributes' => NULL, 'entity' => NULL, 'entity_type' => NULL, 'posterimage_style' => NULL),
+      'template' => 'theme/videojs',
+      'file' => 'includes/videojs.theme.inc',
+    ),
+    'videojs_view' => array(
+      'variables' => array('items' => NULL, 'player_id' => NULL, 'attributes' => NULL),
+      'template' => 'theme/videojs',
+      'file' => 'includes/videojs.theme.inc',
+    ),
+  );
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function videojs_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'videojs') . '/includes',
+  );
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function videojs_field_formatter_info() {
+  return array(
+    'videojs' => array(
+      'label' => t('Video.js : HTML5 Video Player'),
+      'field types' => array('file', 'media', 'link_field'),
+      'description' => t('Display a video file as an HTML5-compatible with Flash-fallback video player.'),
+      'settings'  => array(
+        'width' => NULL,
+        'height' => NULL,
+        'posterimage_field' => NULL,
+        'posterimage_style' => NULL,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function videojs_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  if ($display['type'] !== 'videojs') {
+    return array();
+  }
+  if (empty($items)) {
+    return array();
+  }
+
+  if ($field['type'] == 'link_field') {
+    $links = $items;
+    $items = array();
+    foreach ($links as $link) {
+      // Allow the user to override the mime type using the title field
+      if (!empty($link['title']) && strncmp('video/', $link['title'], 6) === 0) {
+        $mime = $link['title'];
+      }
+      // Manual override for WebM, because Drupal doesn't detect it.
+      elseif (substr($link['url'], -5) == '.webm') {
+        $mime = 'video/webm';
+      }
+      else {
+        $mime = DrupalLocalStreamWrapper::getMimeType($link['url']);
+
+        // If the mime type is application/octet-stream, default to MP4.
+        // This happens for instance for links without extensions.
+        if ($mime == 'application/octet-stream') {
+          $mime = 'video/mp4';
+        }
+      }
+
+      $items[] = array(
+        'uri' => url($link['url'], $link),
+        'filemime' => $mime,
+      );
+    }
+  }
+
+  $settings = $display['settings'];
+  $attributes = array();
+  if (!empty($settings['width']) && !empty($settings['height'])) {
+    $attributes['width'] = intval($settings['width']);
+    $attributes['height'] = intval($settings['height']);
+  }
+
+  // Add the poster image
+  if (!empty($settings['posterimage_field']) && !empty($entity->{$settings['posterimage_field']})) {
+    $images = field_get_items($entity_type, $entity, $settings['posterimage_field']);
+    if (!empty($images)) {
+      array_unshift($items, array_shift($images));
+    }
+  }
+
+  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+  return array(
+    array(
+      '#theme' => 'videojs',
+      '#items' => $items,
+      '#player_id' => 'videojs-' . $id . '-' . str_replace('_', '-', $instance['field_name']),
+      '#attached' => videojs_add(FALSE),
+      '#entity' => $entity,
+      '#entity_type' => $entity_type,
+      '#attributes' => $attributes,
+      '#posterimage_style' => !empty($settings['posterimage_style']) ? $settings['posterimage_style'] : NULL,
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function videojs_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $image_styles = image_style_options(FALSE);
+  if (isset($instance['entity_type']) && isset($instance['bundle'])) {
+    $imagefields = _videojs_find_image_fields($field, $instance['entity_type'], $instance['bundle']);
+  }
+
+  $form = array(
+    '#element_validate' => array('videojs_field_formatter_settings_form_validate'),
+  );
+
+  $form['width'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Width'),
+    '#default_value' => $settings['width'],
+    '#size' => 6,
+    '#maxlength' => 5,
+    '#element_validate' => array('element_validate_integer_positive'),
+  );
+  $form['height'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Height'),
+    '#default_value' => $settings['height'],
+    '#size' => 6,
+    '#maxlength' => 5,
+    '#element_validate' => array('element_validate_integer_positive'),
+  );
+
+  if (!empty($imagefields)) {
+    $form['posterimage_field'] = array(
+      '#type' => 'select',
+      '#title' => t('Poster image field'),
+      '#default_value' => $settings['posterimage_field'],
+      '#options' => $imagefields,
+      '#description' => t('If an image is uploaded to the field above it will be used as the poster image.'),
+      '#empty_value' => NULL,
+      '#empty_option' => t('- None -'),
+    );
+    $form['posterimage_style'] = array(
+      '#title' => t('Poster image style'),
+      '#type' => 'select',
+      '#default_value' => $settings['posterimage_style'],
+      '#empty_option' => t('None (original image)'),
+      '#description' => t('The original video thumbnail will be displayed. Otherwise, you can add a custom image style at !settings.', array('!settings' => l(t('media image styles'), 'admin/config/media/image-styles'))),
+      '#options' => $image_styles,
+    );
+  }
+
+  return $form;
+}
+
+/**
+ * Finds image fields in the given entity and bundle.
+ *
+ * @param $field
+ *   Field definition of the video field, used to match image fields when
+ *   this field is rendered using Views.
+ * @param $entity_type
+ *   Entity type in which the image field must occur.
+ * @param $bundle
+ *   Bundle in which the image field must occur.
+ * @return
+ *   Array of image field names.
+ */
+function _videojs_find_image_fields($field, $entity_type, $bundle) {
+  $imagefields = array();
+
+  // Determine the image fields that will be selectable.
+  if ($entity_type == 'ctools' && $bundle == 'ctools') {
+    // This is a fake instance (see ctools_fields_fake_field_instance()).
+    // This occurs for instance when this formatter is used in Views.
+    // Display all image fields in bundles that contain this field.
+    $otherfields = field_info_fields();
+    foreach ($otherfields as $otherfield) {
+      if ($otherfield['type'] == 'image' && !empty($otherfield['bundles'])) {
+        // Find a label by finding an instance label
+        $instancelabels = array();
+        $bundles_names = array();
+
+        foreach ($otherfield['bundles'] as $otherentitytype => $otherbundles) {
+          foreach ($otherbundles as $otherbundle) {
+            // Check if this image field appears in one of the video field bundles.
+            if (isset($field['bundles'][$otherentitytype]) && in_array($otherbundle, $field['bundles'][$otherentitytype])) {
+              $otherinstance = field_info_instance($otherentitytype, $otherfield['field_name'], $otherbundle);
+              $instancelabels[$otherinstance['label']] = isset($instancelabels[$otherinstance['label']]) ? $instancelabels[$otherinstance['label']] + 1 : 1;
+              $bundles_names[] = t('@entity:@bundle', array('@entity' => $otherentitytype, '@bundle' => $otherbundle));
+            }
+          }
+        }
+
+        if (!empty($instancelabels)) {
+          arsort($instancelabels);
+          $instancelabel = key($instancelabels);
+          $imagefields[$otherfield['field_name']] = $instancelabel . ' — ' . t('Appears in: @bundles.', array('@bundles' => implode(', ', $bundles_names)));
+        }
+      }
+    }
+  }
+  else {
+    $otherinstances = field_info_instances($entity_type, $bundle);
+    foreach ($otherinstances as $otherinstance) {
+      $otherfield = field_info_field_by_id($otherinstance['field_id']);
+      if ($otherfield['type'] == 'image') {
+        $imagefields[$otherinstance['field_name']] = $otherinstance['label'];
+      }
+    }
+  }
+
+  return $imagefields;
+}
+
+function videojs_field_formatter_settings_form_validate($form, $form_state) {
+  $width = $form['width']['#value'];
+  $height = $form['height']['#value'];
+
+  // The fields need to be both entered or both empty
+  if (empty($width) != empty($height)) {
+    form_error($form[empty($width) ? 'height' : 'width'], t('The width and height field need to be both set or both empty.'));
+  }
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function videojs_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $image_styles = image_style_options(FALSE);
+
+  $output = t('Player dimensions: @widthxheight', array(
+    '@widthxheight' => !empty($settings['width']) && !empty($settings['height']) ? $settings['width'] . 'x' . $settings['height'] : t('default'),
+  ));
+
+  if (!empty($settings['posterimage_field'])) {
+    $imageinstance = field_info_instance($instance['entity_type'], $settings['posterimage_field'], $instance['bundle']);
+    if ($imageinstance != NULL) {
+      $output .= '<br/>';
+      $output .= t('Poster image field') . ': ' . check_plain($imageinstance['label']);
+    }
+  }
+
+  $output .= '<br/>';
+  if (isset($image_styles[$settings['posterimage_style']])) {
+    $output .= t('Poster image style') . ': ' . check_plain($image_styles[$settings['posterimage_style']]);
+  }
+  else {
+    $output .= t('Poster image style') . ': ' . t('None');
+  }
+
+  return $output;
+}
+
+/**
+ * Add the Video.js library to the page.
+ *
+ * @param $add
+ *   By default this function will add videojs to the page JavaScript array
+ *   directly. If wanting to store the Video.js file as an #attached property,
+ *   set this to FALSE and videojs_add() will only return the needed array
+ *   suitable for use as an #attached property.
+ */
+function videojs_add($add = TRUE) {
+  static $added = FALSE;
+  if (!isset($added)) {
+    $added = &drupal_static(__FUNCTION__);
+  }
+
+  $directory = variable_get('videojs_directory', 'sites/all/libraries/video-js');
+
+  if (!file_exists($directory . '/video.min.js')) {
+    return FALSE;
+  }
+
+  $libjs = $directory . '/video.min.js';
+  $libcss = $directory . '/video-js.min.css';
+
+  if ($add && !$added) {
+    drupal_add_js($libjs, array('group' => JS_LIBRARY));
+    drupal_add_css($libcss);
+    $added = TRUE;
+  }
+
+  return array(
+    'js' => array(
+      $libjs => array('group' => JS_LIBRARY),
+    ),
+    'css' => array($libcss),
+  );
+}
+
+/**
+ * Return the version of Video.js installed.
+ *
+ * @param $directory
+ *   The directory to check for a Video.js installation.
+ */
+function videojs_get_version($directory = NULL) {
+  $version = NULL;
+
+  if (!isset($directory)) {
+    $directory = variable_get('videojs_directory', 'sites/all/libraries/video-js');
+  }
+
+  if (!file_exists($directory . '/video.js')) {
+    return NULL;
+  }
+
+  $contents = file_get_contents($directory . '/video.js');
+
+  $matches = array();
+  if (preg_match('/(?:v[ ]*|Version )([\d.]+)/i', $contents, $matches)) {
+    $version = $matches[1];
+  }
+
+  return $version;
+}
+
+/**
+ * Implements hook_libraries_info().
+ */
+function videojs_libraries_info() {
+  $libraries = array();
+
+  $libraries['video-js'] = array(
+    'name' => 'Video.js',
+    'vendor url' => 'http://videojs.com',
+    'download url' => 'https://github.com/zencoder/video-js/downloads',
+    'version arguments' => array(
+      'file' => 'video.js',
+      'pattern' => '/(?:v[ ]*|Version )([\d.]+)/i',
+      'lines' => 10,
+      'cols' => 50,
+    ),
+    'versions' => array(
+      '2' => array(
+        'files' => array(
+          'js' => array('video.js' => array('group' => JS_LIBRARY)),
+          'css' => array('video-js.css'),
+        ),
+      ),
+      '3' => array(
+        'files' => array(
+          'js' => array('video.min.js' => array('group' => JS_LIBRARY)),
+          'css' => array('video-js.min.css'),
+        ),
+        'variants' => array(
+          'source' => array(
+            'files' => array(
+              'js' => array('video.js' => array('group' => JS_LIBRARY)),
+              'css' => array('video-js.css'),
+            ),
+            'minified' => array(
+              'files' => array(
+                'js' => array('video.min.js' => array('group' => JS_LIBRARY)),
+                'css' => array('video-js.min.css'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  return $libraries;
+}

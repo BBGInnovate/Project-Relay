@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Relay Panels feature.
+ */
+
+include_once 'relay_panels.features.inc';

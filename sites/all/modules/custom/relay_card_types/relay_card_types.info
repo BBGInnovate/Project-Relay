@@ -1,0 +1,13 @@
+name = Relay
+description = Defines content types for Relay.
+core = 7.x
+package = Relay
+dependencies[] = rules
+dependencies[] = addthis
+dependencies[] = videojs
+dependencies[] = audio_js
+dependencies[] = libraries
+dependencies[] = flickrapi
+dependencies[] = ultimate_cron
+;files[] = tests/example.test
+configure = admin/config/system/relay

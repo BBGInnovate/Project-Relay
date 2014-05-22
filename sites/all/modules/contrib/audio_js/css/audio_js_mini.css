@@ -1,0 +1,98 @@
+.audiojs audio {
+  left: -1px;
+  position: absolute;
+}
+
+.audiojs-mini .audiojs {
+  background: #404040;
+  background-image: -moz-linear-gradient(center top,#444 0%,#555 50%,#444 51%,#444 100%);
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0,#444),color-stop(0.5,#555),color-stop(0.51,#444),color-stop(1,#444));
+  font-family: monospace;
+  font-size: 12px;
+  height: 36px;
+  overflow: hidden;
+  width: 36px;
+}
+
+.audiojs-mini .audiojs .play-pause {
+  float: left;
+  height: 28px;
+  margin: 0;
+  overflow: hidden;
+  padding: 4px 6px;
+  width: 25px;
+}
+
+.audiojs-mini .audiojs p {
+  background-repeat: no-repeat;
+  cursor: pointer;
+  display: none;
+  height: 28px;
+  margin: 0;
+  width: 25px;
+}
+
+.audiojs-mini .audiojs .play {
+  display: block;
+}
+
+.audiojs-mini .audiojs .scrubber,
+.audiojs-mini .audiojs .time {
+  display: none;
+}
+
+.audiojs-mini .audiojs .play {
+  background: url(../images/player-graphics.gif) -2px -1px no-repeat;
+}
+
+.audiojs-mini .audiojs .loading {
+  background: url(../images/player-graphics.gif) -2px -31px no-repeat;
+}
+
+.audiojs-mini .audiojs .error {
+  background: url(../images/player-graphics.gif) -2px -61px no-repeat;
+}
+
+.audiojs-mini .audiojs .pause {
+  background: url(../images/player-graphics.gif) -2px -91px no-repeat;
+}
+
+.audiojs-mini .playing .play,
+.audiojs-mini .playing .loading,
+.audiojs-mini .playing .error {
+  display: none;
+}
+
+.audiojs-mini .playing .pause {
+  display: block;
+}
+
+.audiojs-mini .loading .play,
+.audiojs-mini .loading .pause,
+.audiojs-mini .loading .error {
+  display: none;
+}
+
+.audiojs-mini .loading .loading {
+  display: block;
+}
+
+.audiojs-mini .error .time,
+.audiojs-mini .error .play,
+.audiojs-mini .error .pause,
+.audiojs-mini .error .scrubber,
+.audiojs-mini .error .loading {
+  display: none;
+}
+
+.audiojs-mini .error .error {
+  display: block;
+}
+
+.audiojs-mini .error .play-pause p {
+  cursor: auto;
+}
+
+.audiojs-mini .error .error-message {
+  display: block;
+}

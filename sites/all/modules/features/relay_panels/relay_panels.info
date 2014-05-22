@@ -1,0 +1,12 @@
+name = Relay Panels
+description = Creates the panels used for front-end display
+core = 7.x
+package = Relay
+version = 7.x-1.0
+project = relay_panels
+dependencies[] = ctools
+dependencies[] = page_manager
+features[ctools][] = page_manager:pages_default:1
+features[features_api][] = api:2
+features[page_manager_pages][] = Event
+features[page_manager_pages][] = front_page_panel

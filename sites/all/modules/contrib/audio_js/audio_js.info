@@ -1,0 +1,13 @@
+name = audio.js
+description = Provides a field formatter for the file field type using the audio tag and audio.js javascript library.
+package = Media
+core = 7.x
+dependencies[] = libraries
+dependencies[] = file
+
+; Information added by drupal.org packaging script on 2013-03-12
+version = "7.x-1.0"
+core = "7.x"
+project = "audio_js"
+datestamp = "1363056615"
+

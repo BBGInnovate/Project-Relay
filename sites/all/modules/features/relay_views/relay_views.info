@@ -1,0 +1,16 @@
+name = Relay Views
+description = Configures the default views for front-end display.
+core = 7.x
+package = Relay
+version = 7.x-1.0
+project = relay_views
+dependencies[] = views
+dependencies[] = views_infinite_scroll
+dependencies[] = views_slideshow
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:2
+features[views_view][] = event
+features[views_view][] = event_carousel
+features[views_view][] = events
+features[views_view][] = sticky_card
+features_exclude[dependencies][ctools] = ctools

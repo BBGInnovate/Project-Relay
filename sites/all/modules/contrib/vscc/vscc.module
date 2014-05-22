@@ -1,0 +1,142 @@
+<?php
+
+/**
+ * @file
+ * Views Slideshow Configurable Controls hook implementations.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function vscc_theme($existing, $type, $theme, $path) {
+  return array(
+    'vscc_controls' => array(
+      'variables' => array('vss_id' => NULL, 'view' => NULL, 'settings' => array(), 'location' => NULL, 'rows' => array()),
+      'template' => 'theme/vscc_controls',
+    ),
+    'vscc_control' => array(
+      'variables' => array('skin' => NULL, 'element' => NULL, 'vss_id' => NULL, 'view' => NULL, 'settings' => array(), 'location' => NULL, 'rows' => array()),
+      'file' => 'vscc.theme.inc',
+      'path' => drupal_get_path('module', 'vscc') . '/theme',
+    ),
+    'vscc_element_text' => array(
+      'variables' => array('element' => NULL, 'vss_id' => NULL, 'view' => NULL, 'settings' => array(), 'location' => NULL, 'rows' => array()),
+      'file' => 'vscc.theme.inc',
+      'path' => drupal_get_path('module', 'vscc') . '/theme',
+    ),
+    'vscc_element_white_icons' => array(
+      'variables' => array('element' => NULL, 'vss_id' => NULL, 'view' => NULL, 'settings' => array(), 'location' => NULL, 'rows' => array()),
+      'file' => 'vscc.theme.inc',
+      'path' => drupal_get_path('module', 'vscc') . '/theme',
+    ),
+    'vscc_element_black_icons' => array(
+      'variables' => array('element' => NULL, 'vss_id' => NULL, 'view' => NULL, 'settings' => array(), 'location' => NULL, 'rows' => array()),
+      'file' => 'vscc.theme.inc',
+      'path' => drupal_get_path('module', 'vscc') . '/theme',
+    ),
+  );
+}
+
+function template_preprocess_vscc_controls(&$vars) {
+  $vars['classes_array'][] = 'vscc_controls';
+
+  drupal_add_js(drupal_get_path('module', 'vscc') . '/js/vscc.js');
+  drupal_add_css(drupal_get_path('module', 'vscc') . '/vscc.css');
+
+  $theme_vars = array_merge($vars, array('skin' => $vars['settings']['vscc_controls_skin']));
+
+  $vars['rendered_control_previous'] = theme('vscc_control', array_merge($theme_vars, array('element' => 'previous')));
+
+  if ($vars['settings']['vscc_controls_pause']) {
+    $vars['rendered_control_pause'] = theme('vscc_control', array_merge($theme_vars, array('element' => 'pause')));
+  }
+
+  $vars['rendered_control_next'] = theme('vscc_control', array_merge($theme_vars, array('element' => 'next')));
+}
+
+/**
+ * Implements hook_views_slideshow_controls_info().
+ */
+function vscc_views_slideshow_widget_controls_info($view) {
+  return array(
+    'vscc_controls' => array(
+      'name' => t('Configurable controls'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_views_slideshow_option_definition().
+ */
+function vscc_views_slideshow_option_definition() {
+  $locations = array('top', 'bottom');
+
+  foreach ($locations as $location) {
+    $options['widgets']['contains'][$location]['contains']['views_slideshow_controls']['contains']['vscc_controls_pause'] = array('default' => TRUE);
+    $options['widgets']['contains'][$location]['contains']['views_slideshow_controls']['contains']['vscc_controls_skin'] = array('default' => 'text');
+  }
+
+  return $options;
+}
+
+/**
+ * Implements [control_key]_views_slideshow_widget_controls_form_options().
+ */
+function vscc_controls_views_slideshow_widget_controls_form_options(&$form, &$form_state, &$view, $defaults, $dependency) {
+  $closure = end($form);
+  $closure_key = key($form);
+  array_pop($form);
+    // Need to wrap this so it indents correctly.
+  $form['vscc_controls_wrapper'] = array(
+    '#markup' => '<div class="vs-dependent-lvl3">',
+  );
+
+  $elements_states = array(
+    'visible' => array(
+      ':input[name="' . $dependency . '[enable]"]' => array('checked' => TRUE),
+      ':input[name="' . $dependency . '[type]"]' => array('value' => 'vscc_controls'),
+    ),
+  );
+  $form['vscc_controls_pause'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Display pause control'),
+    '#states' => $elements_states,
+    '#default_value' => $defaults['vscc_controls_pause'],
+  );
+
+  $skins = module_invoke_all('vscc_skin_info');
+  $options = array();
+  foreach ($skins as $key => $skin) {
+    $options[$key] = $skin['name'];
+  }
+
+  $form['vscc_controls_skin'] = array(
+    '#type' => 'select',
+    '#title' => t('Controls skin'),
+    '#states' => $elements_states,
+    '#options' => $options,
+    '#default_value' => $defaults['vscc_controls_skin'],
+  );
+
+  $form['vscc_controls_wrapper_close'] = array(
+    '#markup' => '</div>',
+  );
+  $form[$closure_key] = $closure;
+}
+
+/**
+ * Implements hook_vscc_skin_info().
+ */
+function vscc_vscc_skin_info() {
+  return array(
+    'text' => array(
+      'name' => t('Text'),
+    ),
+    'white_icons' => array(
+      'name' => t('White icons'),
+    ),
+    'black_icons' => array(
+      'name' => t('Black icons'),
+    )
+  );
+}

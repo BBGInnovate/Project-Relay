@@ -1,0 +1,16 @@
+name = Video.js
+description = Video.js is an HTML5 Video Player with 3 core parts: An embed code (Video for Everybody), a Javascript library (video.js), and a pure HTML/CSS skin (video-js.css).
+package = Media
+core = 7.x
+dependencies[] = file
+configure = admin/config/media/videojs
+files[] = videojs.module
+files[] = includes/videojs.admin.inc
+files[] = includes/videojs.theme.inc
+files[] = includes/videojs.views.inc
+; Information added by drupal.org packaging script on 2013-05-19
+version = "7.x-2.3"
+core = "7.x"
+project = "videojs"
+datestamp = "1368994216"
+

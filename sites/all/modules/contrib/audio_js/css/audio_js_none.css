@@ -1,0 +1,41 @@
+.audiojs audio {
+  left: -1px;
+  position: absolute;
+}
+
+.audiojs-none .audiojs p {
+  cursor: pointer;
+  display: none;
+}
+
+.audiojs-none .audiojs .play {
+  display: block;
+}
+
+.audiojs-none .playing .play,
+.audiojs-none .playing .loading,
+.audiojs-none .playing .error {
+  display: none;
+}
+
+.audiojs-none .playing .pause {
+  display: block;
+}
+
+.audiojs-none .loading .play,
+.audiojs-none .loading .pause,
+.audiojs-none .loading .error {
+  display: none;
+}
+
+.audiojs-none .loading .loading {
+  display: block;
+}
+
+.audiojs-none .error .time,
+.audiojs-none .error .play,
+.audiojs-none .error .pause,
+.audiojs-none .error .scrubber,
+.audiojs-none .error .loading {
+  display: none;
+}

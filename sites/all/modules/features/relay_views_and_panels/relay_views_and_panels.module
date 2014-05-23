@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Relay Views and Panels feature.
+ */
+
+include_once 'relay_views_and_panels.features.inc';

@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * relay_panels.pages_default.inc
+ * relay_views_and_panels.pages_default.inc
  */
 
 /**
  * Implements hook_default_page_manager_pages().
  */
-function relay_panels_default_page_manager_pages() {
+function relay_views_and_panels_default_page_manager_pages() {
   $page = new stdClass();
   $page->disabled = FALSE; /* Edit this to true to make a default page disabled initially */
   $page->api_version = 1;

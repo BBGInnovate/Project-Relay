@@ -12,4 +12,5 @@ dependencies[] = rules
 features[ctools][] = feeds:feeds_importer_default:1
 features[features_api][] = api:2
 features[feeds_importer][] = message_importer
+features[rules_config][] = rules_create_cards_from_mail
 features[rules_config][] = rules_poll_for_cards

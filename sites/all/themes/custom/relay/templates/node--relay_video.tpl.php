@@ -95,8 +95,7 @@ if (drupal_is_front_page()) {
 <article id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?>"<?php print $attributes; ?>>
 
     <section>
-        <div class="small-12 column cs_bg_blue card_top_row"> <span class="left spotlight"><i class="fa fa-bolt"></i> <a href="<?php print $cs_eventurl; ?>" class="cs_white"><?php print $cs_title; ?></a></span><span class="right"><a data-reveal-id="alert_modal" class="cs_white" href="#">Get Alerts</a> <a data-refresh-events="" class="cs_white" href="#"><i class="fa fa-bell"></i><div data-count="2" id="badge">3</div></a>
-	</span></div>
+        <div class="small-12 column cs_bg_blue card_top_row"> <span class="left spotlight"><i class="fa fa-bolt"></i> <a href="<?php print $cs_eventurl; ?>" class="cs_white"><?php print $cs_title; ?></a></span>
     </section>
 
     <section class="cs_main relay_video">

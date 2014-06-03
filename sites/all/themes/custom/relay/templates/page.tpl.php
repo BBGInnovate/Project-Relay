@@ -14,7 +14,7 @@ $twitterShare =  'http://twitter.com/intent/tweet?source=sharethiscom&text=' . $
 $googleShare =  'https://plus.google.com/share?url=' . $base_url;
 ?>
 
-<div class="page-top-bg"></div>
+
 <div role="document" class="page">
 
   <!--.l-header -->
@@ -26,17 +26,18 @@ $googleShare =  'https://plus.google.com/share?url=' . $base_url;
         <div class="<?php print $top_bar_classes; ?>">
       <?php endif; ?>
       <nav class="top-bar" data-topbar <?php print $top_bar_options; ?>>
-        <ul class="title-area cs_bg_white">
+        <ul class="title-area">
 				<li class="name"><h1><span class="left"><a href="<?php print $front_page; ?>"><img src="/<?php print path_to_theme(); ?>/images/VOA-blue-official.png" class="logo" alt="VOA logo" /></a></span><span class="left cs_white logo-text"><?php print $linked_site_name; ?></span></h1></li>
-          <li class="toggle-topbar menu-icon"><a href="#"><span><?php print $top_bar_menu_text; ?></span></a></li>
+          <li class="toggle-topbar menu-icon"> <a href="#"></a> </li>
         </ul>
-			  <section class="top-bar-section cs_bg_white">
-				<ul class="right">
-				  <li><a href="<?php print $facebookShare ?>"><i class="fa fa-facebook-square fa-2x"></i></a></li>
-				  <li><a href="<?php print $twitterShare ?>"><i class="fa fa-twitter fa-2x"></i></a></li>
-				  <li><a href="<?php print $googleShare ?>"><i class="fa fa-google-plus fa-2x"></i></a></li>
-				  <li class="active"><a href="#"><i class="fa fa-question fa-2x"></i></a></li>
-				</ul>
+        <!-- Top Nav Section -->
+        <section class="top-bar-section">
+        <ul class="right">
+          <li><a href="#">About Relay</a></li>
+          <li><a href="#"><i class="fa fa-twitter"></i> Follow Us</a></li>
+          <li><a href="#"><i class="fa fa-facebook"></i> Become a Fan</a></li>
+          <li><a href="#">Contact Us</a></li>
+        </ul>
 			  </section>
       </nav>
 			<section class="social">

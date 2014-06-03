@@ -77,60 +77,57 @@
 ?>
 
 <?php
+
+// Get event name
+$result = field_view_field('node', $node, 'relay_events_ref', array('default'));
 if (drupal_is_front_page()) {
-    $cs_title = 'Live Now';
-    $nid = 2;
-    $node = node_load($nid);
-    $result = field_view_field('node', $node, 'relay_events_ref', array('default'));
     $cs_eventurl =  '/event/' . $result['#object']->relay_events_ref['und'][0]['taxonomy_term']->tid;
+    $cs_title = 'Live Now';
 } else {
-    $nid = 2;
-    $node = node_load($nid);
-    $result = field_view_field('node', $node, 'relay_events_ref', array('default'));
-    $cs_title =  $result['#object']->relay_events_ref['und'][0]['taxonomy_term']->name;
     $cs_eventurl =  $node_url;
+    $cs_title =  $result['#object']->relay_events_ref['und'][0]['taxonomy_term']->name;
 }
+
+// Setup social sharing links
+Global $base_url;
+$facebookShare =  'http://www.facebook.com/sharer.php?u=' . $base_url . '&t=' . $cs_title;
+$twitterShare =  'http://twitter.com/intent/tweet?source=sharethiscom&text=' . $cs_title . '&url=' . $base_url;
+$googleShare =  'https://plus.google.com/share?url=' . $base_url;
+
 ?>
 
-<article id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?>"<?php print $attributes; ?>>
 
-    <section>
-        <div class="small-12 column cs_bg_blue card_top_row"> <span class="left spotlight"><i class="fa fa-bolt"></i> <a href="<?php print $cs_eventurl; ?>" class="cs_white"><?php print $cs_title; ?></a></span><span class="right"><a data-reveal-id="alert_modal" class="cs_white" href="#">Get Alerts</a> <a data-refresh-events="" class="cs_white" href="#"><i class="fa fa-bell"></i><div data-count="2" id="badge">3</div></a>
-	</span></div>
-    </section>
-
-    <section class="cs_main relay_video">
-      <div class="column" style="padding-left: 0;padding-right: 0;">
-        <div class="flex-video widescreen">
-        <?php
-        // We hide the comments and links now so that we can render them later.
-        hide($content['title']);
-        hide($content['relay_pin_card']);
-        hide($content['relay_authors']);
-        hide($content['relay_events_ref']);
-        hide($content['relay_addthis']);
-        hide($content['relay_tweet_status_id']);
-        hide($content['relay_video_file']);
-        hide($content['relay_youtube_code']);
-        hide($content['comments']);
-        hide($content['links']);
-        hide($content['field_tags']);
-        print render($content);
-        ?>
+<div class="small-12 column cs_bg_blue card_top_row"> <span class="left spotlight"><i class="fa fa-bolt"></i> <?php print $cs_title; ?></span></div>
+<div class="card_content">
+    <div class="small-12 columns">
+        <div class="flex-video row">
+    <?php
+    //print render($content['FIELDNAME']);
+    //print render($content['body']);
+    //print render($content);
+    //hide($content['title']);
+    //hide($content['body']);
+    //hide($content['relay_pin_card']);
+    //hide($content['relay_authors']);
+    //hide($content['relay_events_ref']);
+    //hide($content['relay_addthis']);
+    //hide($content['relay_tweet_status_id']);
+    //hide($content['relay_more_link']);
+    //hide($content['relay_video_file']);
+    //hide($content['relay_youtube_code']);
+    //hide($content['comments']);
+    //hide($content['links']);
+    //hide($content['field_tags']);
+    print render($content['body']);
+    ?>
         </div>
-      </div>
-    </section>
-
-    <section class="footer-content">
-
-        <h2<?php print $title_attributes; ?>><a href="<?php print $node_url; ?>"><?php print $title; ?></a></h2>
-
-        <div class="card_social light">
-		  <span class="left">
-			  <a href="#"><i class="fa fa-facebook-square"></i></a>
-			  <a href="#"><i class="fa fa-twitter"></i></a>
-			  <a href="#"><i class="fa fa-google-plus-square"></i></a>
-		  </span>
-        </div>
-    </section>
-</article>
+    </div>
+</div>
+<div class="small-12 column card_time_row"><span class="left"><?php print $cs_rawhashtag ?></span><span class="
+timeago right
+thin"><?php echo format_interval(time()-$node->created),' ago'; ?></span> </div>
+<div class="small-12 column card_latest_row cs_bg_white dark">
+    <p><a href="<?php print $node_url; ?>"><?php print $title; ?></a></p>
+    <div class="card_social dark"><span class="left"><a href="<?php print $facebookShare; ?>"><i class="fa fa-facebook-square"></i></a> <a href="<?php print $twitterShare; ?>"><i class="fa fa-twitter"></i></a> <a href="<?php print $googleShare; ?>"><i class="fa fa-google-plus-square"></i></a></span><span class="right"><a href="#"><i class="fa fa-comment"></i></a></span></div>
+    <p class="card_follow_live"><a href="<?php print $cs_eventurl; ?>">Follow our live coverage <i class="fa fa-chevron-circle-right"></i></a></p>
+</div>

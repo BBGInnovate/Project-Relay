@@ -29,11 +29,13 @@ base theme = zurb_foundation
 ; For CSS users, load the app.css file:
 stylesheets[all][] = css/app.css
 ; Comment the app.css file (above) if you're using sass to preprocess css:
-stylesheets[all][] = css/relay.css
 
 ; Block loading of foundation.min.css from the base theme. This file should either
 ; not exist or be blank in your subtheme. See https://drupal.org/node/263967
+stylesheets[all][] = css/normalize.css
 stylesheets[all][] = css/foundation.min.css
+stylesheets[all][] = css/relay.css
+stylesheets[all][] = css/custom.css
 stylesheets[all][] = css/font-awesome.css
 
 ; Foundation JavaScript.
@@ -81,15 +83,9 @@ scripts[] = js/foundation.min.js
 ;   <?php print render($page['header']); ?>
 
 regions[header]              = Header
-regions[help]                = Help
-regions[highlighted]         = Highlighted
-regions[featured]            = Featured
 regions[content]             = Content
 regions[sidebar_first]       = Left Sidebar
 regions[sidebar_second]      = Right Sidebar
-regions[triptych_first]      = Callout one
-regions[triptych_middle]     = Callout two
-regions[triptych_last]       = Callout three
 regions[footer_firstcolumn]  = Footer one
 regions[footer_secondcolumn] = Footer two
 regions[footer_thirdcolumn]  = Footer three

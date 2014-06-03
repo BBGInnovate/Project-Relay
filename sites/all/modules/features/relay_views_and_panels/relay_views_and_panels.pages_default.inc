@@ -211,7 +211,10 @@ function relay_views_and_panels_default_page_manager_pages() {
     $pane->style = array(
       'settings' => NULL,
     );
-    $pane->css = array();
+    $pane->css = array(
+      'css_id' => '',
+      'css_class' => 'row thick_border',
+    );
     $pane->extras = array();
     $pane->position = 0;
     $pane->locks = array();
@@ -228,7 +231,12 @@ function relay_views_and_panels_default_page_manager_pages() {
     $pane->configuration = array(
       'admin_title' => 'Past Events',
       'title' => '',
-      'body' => '<div class="cs_pastevents_panel"><p><a href="#"><i class="fa fa-folder"></i> Past Events</a></p></div>',
+      'body' => '<!-- Past Events Title -->
+<div class="row thick_border">
+  <div class="small-12 column card_pastevents_row">
+    <p><a href="/"><i class="fa fa-folder"></i> Past Events</a></p>
+  </div>
+</div>',
       'format' => 'full_html',
       'substitute' => TRUE,
     );
@@ -238,7 +246,7 @@ function relay_views_and_panels_default_page_manager_pages() {
     );
     $pane->css = array(
       'css_id' => '',
-      'css_class' => 'card_pastevents_row',
+      'css_class' => '',
     );
     $pane->extras = array();
     $pane->position = 1;
@@ -273,7 +281,10 @@ function relay_views_and_panels_default_page_manager_pages() {
     $pane->style = array(
       'settings' => NULL,
     );
-    $pane->css = array();
+    $pane->css = array(
+      'css_id' => '',
+      'css_class' => 'summary_card row thick_border',
+    );
     $pane->extras = array();
     $pane->position = 2;
     $pane->locks = array();

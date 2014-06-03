@@ -17,6 +17,7 @@
  *
  */
 //function relay_preprocess_page(&$variables) {
+//    $variables['eventHashTag'] = 'eventHashTag';
 //}
 
 /**

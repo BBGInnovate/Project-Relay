@@ -104,6 +104,8 @@ function relay_views_and_panels_views_default_views() {
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['pager']['options']['id'] = '0';
   $handler->display->display_options['style_plugin'] = 'slideshow';
+  $handler->display->display_options['style_options']['default_row_class'] = FALSE;
+  $handler->display->display_options['style_options']['row_class_special'] = FALSE;
   $handler->display->display_options['style_options']['slideshow_type'] = 'views_slideshow_cycle';
   $handler->display->display_options['style_options']['slideshow_skin'] = 'default';
   $handler->display->display_options['style_options']['skin_info'] = array(
@@ -117,8 +119,9 @@ function relay_views_and_panels_views_default_views() {
   $handler->display->display_options['style_options']['widgets']['top']['views_slideshow_pager']['type'] = 'views_slideshow_pager_fields';
   $handler->display->display_options['style_options']['widgets']['top']['views_slideshow_pager']['views_slideshow_pager_fields_fields'] = array(
     'title' => 0,
-    'type' => 0,
+    'relay_photo_file' => 0,
     'body' => 0,
+    'type' => 0,
     'created' => 0,
     'title_1' => 0,
   );
@@ -133,8 +136,9 @@ function relay_views_and_panels_views_default_views() {
   $handler->display->display_options['style_options']['widgets']['bottom']['views_slideshow_pager']['views_slideshow_pager_fields_fields'] = array(
     'title_1' => 'title_1',
     'title' => 0,
-    'type' => 0,
+    'relay_photo_file' => 0,
     'body' => 0,
+    'type' => 0,
     'created' => 0,
   );
   $handler->display->display_options['style_options']['widgets']['bottom']['views_slideshow_pager']['views_slideshow_pager_fields_hover'] = 1;
@@ -160,26 +164,42 @@ function relay_views_and_panels_views_default_views() {
   $handler->display->display_options['style_options']['views_slideshow_cycle']['cleartypenobg'] = 0;
   $handler->display->display_options['style_options']['views_slideshow_cycle']['advanced_options'] = '{"width":"1000px"}';
   $handler->display->display_options['row_plugin'] = 'fields';
-  $handler->display->display_options['row_options']['inline'] = array(
-    'body' => 'body',
-    'title' => 'title',
-    'created' => 'created',
-    'title_1' => 'title_1',
-  );
+  $handler->display->display_options['row_options']['hide_empty'] = TRUE;
+  $handler->display->display_options['row_options']['default_field_elements'] = FALSE;
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
-  /* Field: Content: Type */
-  $handler->display->display_options['fields']['type']['id'] = 'type';
-  $handler->display->display_options['fields']['type']['table'] = 'node';
-  $handler->display->display_options['fields']['type']['field'] = 'type';
+  $handler->display->display_options['fields']['title']['label'] = '';
+  $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['title']['element_default_classes'] = FALSE;
+  $handler->display->display_options['fields']['title']['hide_empty'] = TRUE;
+  /* Field: Content: Photo File */
+  $handler->display->display_options['fields']['relay_photo_file']['id'] = 'relay_photo_file';
+  $handler->display->display_options['fields']['relay_photo_file']['table'] = 'field_data_relay_photo_file';
+  $handler->display->display_options['fields']['relay_photo_file']['field'] = 'relay_photo_file';
+  $handler->display->display_options['fields']['relay_photo_file']['label'] = '';
+  $handler->display->display_options['fields']['relay_photo_file']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['relay_photo_file']['element_default_classes'] = FALSE;
+  $handler->display->display_options['fields']['relay_photo_file']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['relay_photo_file']['hide_alter_empty'] = FALSE;
+  $handler->display->display_options['fields']['relay_photo_file']['click_sort_column'] = 'fid';
+  $handler->display->display_options['fields']['relay_photo_file']['settings'] = array(
+    'image_style' => '',
+    'image_link' => '',
+  );
   /* Field: Content: Description */
   $handler->display->display_options['fields']['body']['id'] = 'body';
   $handler->display->display_options['fields']['body']['table'] = 'field_data_body';
   $handler->display->display_options['fields']['body']['field'] = 'body';
   $handler->display->display_options['fields']['body']['label'] = '';
   $handler->display->display_options['fields']['body']['element_label_colon'] = FALSE;
+  /* Field: Content: Type */
+  $handler->display->display_options['fields']['type']['id'] = 'type';
+  $handler->display->display_options['fields']['type']['table'] = 'node';
+  $handler->display->display_options['fields']['type']['field'] = 'type';
+  $handler->display->display_options['fields']['type']['label'] = '';
+  $handler->display->display_options['fields']['type']['element_label_colon'] = FALSE;
   /* Field: Content: Post date */
   $handler->display->display_options['fields']['created']['id'] = 'created';
   $handler->display->display_options['fields']['created']['table'] = 'node';
@@ -372,11 +392,6 @@ function relay_views_and_panels_views_default_views() {
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['row_plugin'] = 'node';
-  /* Sort criterion: Content: Sticky */
-  $handler->display->display_options['sorts']['sticky']['id'] = 'sticky';
-  $handler->display->display_options['sorts']['sticky']['table'] = 'node';
-  $handler->display->display_options['sorts']['sticky']['field'] = 'sticky';
-  $handler->display->display_options['sorts']['sticky']['order'] = 'DESC';
   /* Sort criterion: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
@@ -389,6 +404,13 @@ function relay_views_and_panels_views_default_views() {
   $handler->display->display_options['filters']['status']['value'] = '1';
   $handler->display->display_options['filters']['status']['group'] = 1;
   $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+  /* Filter criterion: Content: Pin Card (relay_pin_card) */
+  $handler->display->display_options['filters']['relay_pin_card_value']['id'] = 'relay_pin_card_value';
+  $handler->display->display_options['filters']['relay_pin_card_value']['table'] = 'field_data_relay_pin_card';
+  $handler->display->display_options['filters']['relay_pin_card_value']['field'] = 'relay_pin_card_value';
+  $handler->display->display_options['filters']['relay_pin_card_value']['value'] = array(
+    1 => '1',
+  );
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');

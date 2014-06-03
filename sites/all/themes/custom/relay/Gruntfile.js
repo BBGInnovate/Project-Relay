@@ -1,5 +1,5 @@
 module.exports = function(grunt) {
-  var theme_name = 'STARTER';
+  var theme_name = 'relay';
 
   var global_vars = {
     theme_name: theme_name,

@@ -170,7 +170,7 @@ function flickrapi_admin_settings_submit($form, &$form_state) {
   // If the Access Permissions have changed, we need to re-authenticate.
   if ($perm_element = $form_state['complete form']['advanced']['flickrapi_access_permissions']) {
     if ($perm_element['#value'] != $perm_element['#default_value']) {
-      _flickrapi_oauth_clear();
+      //_flickrapi_oauth_clear();
     }
   }
 

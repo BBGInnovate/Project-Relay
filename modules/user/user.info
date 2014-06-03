@@ -8,3 +8,9 @@ files[] = user.test
 required = TRUE
 configure = admin/config/people
 stylesheets[all][] = user.css
+
+; Information added by Drupal.org packaging script on 2014-05-08
+version = "7.28"
+project = "drupal"
+datestamp = "1399522731"
+

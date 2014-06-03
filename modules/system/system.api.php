@@ -749,26 +749,6 @@ function hook_js_alter(&$javascript) {
 }
 
 /**
- * Perform necessary alterations to the concatenated JavaScript before it is
- * presented on the page.
- *
- * @param $contents
- *   A string of the concatenated JavaScript.
- *
- * @see drupal_build_js_cache()
- */
-function hook_js_cache_alter(&$contents) {
-  $header = <<<HEADER
-/**
- * Powered by Pressflow
- * http://pressflow.org
- */
-HEADER;
-
-  $contents = $header . "\n" . $contents;
-}
-
-/**
  * Registers JavaScript/CSS libraries associated with a module.
  *
  * Modules implementing this return an array of arrays. The key to each
@@ -895,7 +875,7 @@ function hook_css_alter(&$css) {
  *
  * @see ajax_render()
  */
-function hook_ajax_render_alter($commands) {
+function hook_ajax_render_alter(&$commands) {
   // Inject any new status messages into the content area.
   $commands[] = ajax_command_prepend('#block-system-main .content', theme('status_messages'));
 }

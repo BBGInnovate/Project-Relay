@@ -860,7 +860,7 @@ function libraries_get_version($library, $options) {
   $file = fopen($file, 'r');
   while ($options['lines'] && $line = fgets($file, $options['cols'])) {
     if (preg_match($options['pattern'], $line, $version)) {
-      fclose($file); print_r( $library ); print_r( $version );
+      fclose($file);
       return $version[1];
     }
     $options['lines']--;

@@ -5,3 +5,9 @@ version = VERSION
 core = 7.x
 hidden = TRUE
 dependencies[] = _missing_dependency
+
+; Information added by Drupal.org packaging script on 2014-05-08
+version = "7.28"
+project = "drupal"
+datestamp = "1399522731"
+

@@ -15,17 +15,14 @@ function zurb_foundation_drush_command() {
     'aliases' => array('fst'),
     'arguments' => array(
       'name'         => 'Your sub-theme name.',
-      'machine_name' => 'A machine-readable name for your theme, optional only  [a-z, 0-9] ',
     ),
     'options' => array(
+      'machine_name' => 'A machine-readable name for your theme, optional. Machine name must be lowercase only, with underscores instead of spaces.',
       'description'  => 'Your sub-theme description.',
-      'machine-name' => '[a-z, 0-9] A machine-readable name for your theme.',
-      //'name'         => 'A name for your theme.',
-      //'without-rtl'  => 'Remove all RTL stylesheets.',
     ),
     'examples' => array(
       'drush fst "custom theme name"' => 'Create a sub-theme with the default options.',
-      'drush fst "foo bar" "foo_bar"  --description="My supersweet awesome theme"' => 'Create a sub-theme with additional options.',
+      'drush fst "foo bar" "foo_bar" --description="My supersweet awesome theme"' => 'Create a sub-theme with additional options.',
     ),
   );
 
@@ -35,11 +32,15 @@ function zurb_foundation_drush_command() {
 /**
  * Create a Zurb foundation sub-theme.
  */
-function drush_zurb_foundation_foundation_sub_theme($name = NULL, $machine_name = NULL, $description = NULL) {
+function drush_zurb_foundation_foundation_sub_theme($name) {
+  $description = drush_get_option('description');
+  $machine_name = drush_get_option('machine_name');
+
   if (empty($name)) {
-    drush_set_error(dt("Please provide a name for the sub-theme.\nUSAGE:\tdrush fst [name] [machine_name !OPTIONAL] [description !OPTIONAL]\n"));
+    drush_set_error(dt("Please provide a name for the sub-theme.\nUSAGE:\tdrush fst [name] --machine_name=[machine_name !OPTIONAL] --description=[description !OPTIONAL]\n"));
     return;
   }
+
   //Filter everything but letters, numbers, underscores, and hyphens
   $machine_name = !empty($machine_name) ? preg_replace('/[^a-z0-9_-]+/', '', strtolower($machine_name)) : preg_replace('/[^a-z0-9_-]+/', '', strtolower($name));
   // Eliminate hyphens
@@ -70,13 +71,16 @@ function drush_zurb_foundation_foundation_sub_theme($name = NULL, $machine_name 
 
   // Update the .info file
   drush_op('zurb_foundation_file_str_replace', "$subtheme_path/$machine_name.info", 'ZURB Foundation Sub-theme Starter', "$name");
-  // Change the name of the theme
-  if (!empty($description))
-    drush_op('zurb_foundation_file_str_replace', "$subtheme_path/$machine_name.info", 'Custom sub-theme, inherits from the Foundation base theme read <a href="http://foundation.zurb.com/docs/index.php">framework documentation</a>', "$description");
+
+  // Change the description of the theme
+  if (!empty($description)) {
+    drush_op('zurb_foundation_file_str_replace', "$subtheme_path/$machine_name.info", 'Custom sub-theme based on the the Zurb Foundation base theme.', "$description");
+  }
+
   // Create the template.php file with replaced theme name
   drush_op('zurb_foundation_file_str_replace', "$subtheme_path/template.php", 'STARTER', "$machine_name");
   // Rename the .info reference to the custom css file
-  drush_op('zurb_foundation_file_str_replace', "$subtheme_path/$machine_name.info", 'custom.css', "$machine_name.css");
+  drush_op('zurb_foundation_file_str_replace', "$subtheme_path/$machine_name.info", 'STARTER.css', "$machine_name.css");
   // Rename the .info reference to the custom js file
   drush_op('zurb_foundation_file_str_replace', "$subtheme_path/$machine_name.info", 'scripts.js', "$machine_name.js");
   // Rename the Drupal behavior name in the custom js file.

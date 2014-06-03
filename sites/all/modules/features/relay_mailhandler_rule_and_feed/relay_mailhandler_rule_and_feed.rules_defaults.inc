@@ -9,6 +9,16 @@
  */
 function relay_mailhandler_rule_and_feed_default_rules_configuration() {
   $items = array();
+  $items['rules_create_cards_from_mail'] = entity_import('rules_config', '{ "rules_create_cards_from_mail" : {
+      "LABEL" : "Create Cards from Mail",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "Relay" ],
+      "REQUIRES" : [ "relay_card_types", "rules" ],
+      "ON" : { "node_insert--relay_msg_src" : { "bundle" : "relay_msg_src" } },
+      "DO" : [ { "relay_card_types_process_message" : { "message_id" : [ "node" ] } } ]
+    }
+  }');
   $items['rules_poll_for_cards'] = entity_import('rules_config', '{ "rules_poll_for_cards" : {
       "LABEL" : "Poll for Cards",
       "PLUGIN" : "reaction rule",

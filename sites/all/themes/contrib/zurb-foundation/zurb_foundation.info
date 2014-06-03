@@ -64,9 +64,9 @@ settings[zurb_foundation_html_tags] = 1
 settings[zurb_foundation_messages_modal] = 0
 settings[zurb_foundation_pager_center] = 1
 
-; Information added by Drupal.org packaging script on 2014-02-19
-version = "7.x-5.0-alpha3"
+; Information added by Drupal.org packaging script on 2014-04-27
+version = "7.x-5.0-alpha4"
 core = "7.x"
 project = "zurb-foundation"
-datestamp = "1392847787"
+datestamp = "1398632628"
 

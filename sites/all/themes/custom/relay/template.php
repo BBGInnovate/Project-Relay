@@ -17,7 +17,27 @@
  *
  */
 function relay_preprocess_page(&$variables) {
-    $variables['cs_pinned_nid'] = 1;
+
+    {
+        try
+        {
+            $tmp_pinned_nid = db_query("
+      SELECT node.nid AS nid
+      FROM node
+	  INNER JOIN field_data_relay_pin_card ON node.nid = field_data_relay_pin_card.entity_id
+      AND (field_data_relay_pin_card.entity_type = 'node' AND field_data_relay_pin_card.deleted = '0')
+      WHERE (( (node.status = '1') AND (field_data_relay_pin_card.relay_pin_card_value = '1') ))
+      ORDER BY node.created DESC
+      LIMIT 1 OFFSET 0
+    ")->fetchField();
+            $variables['cs_pinned_nid'] = $tmp_pinned_nid;
+        }
+        catch (Exception $e)
+        {
+            $variables['cs_pinned_nid'] = 1;
+        }
+    }
+
 }
 
 /**

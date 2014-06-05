@@ -61,3 +61,4 @@ dependencies[] = views_slideshow
 dependencies[] = views_slideshow_cycle
 dependencies[] = views_ui
 dependencies[] = vscc
+dependencies[] = relay_card_types

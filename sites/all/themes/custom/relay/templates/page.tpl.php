@@ -1,7 +1,7 @@
 <!--.page -->
 <?php
 // Get Pinned Node ID
-$nid = $cs_pinned_nid;
+$nid = 1;
 $node = node_load($nid);
 
 // Get hashtag

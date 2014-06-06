@@ -108,18 +108,19 @@ $googleShare =  'https://plus.google.com/share?url=' . $base_url;
     <?php
     //print render($content['FIELDNAME']);
     //print render($content);
-    hide($content['title']);
-    hide($content['body']);
+    //hide($content['title']);
+    //hide($content['body']);
     hide($content['relay_pin_card']);
     hide($content['relay_authors']);
     hide($content['relay_events_ref']);
     hide($content['relay_addthis']);
     hide($content['relay_tweet_status_id']);
+    //hide($content['relay_audio_file']);
     hide($content['relay_more_link']);
     hide($content['comments']);
     hide($content['links']);
     hide($content['field_tags']);
-    print render($content['relay_audio_file']);
+    print render($content);
     ?>
 </div>
 <div class="small-12 column card_time_row"><span class="left"><?php print $cs_rawhashtag ?></span><span class="

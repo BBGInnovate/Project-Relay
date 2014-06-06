@@ -102,7 +102,7 @@ $googleShare =  'https://plus.google.com/share?url=' . $base_url;
     <?php
     //print render($content['FIELDNAME']);
     //print render($content);
-    hide($content['title']);
+    //hide($content['title']);
     //hide($content['body']);
     hide($content['relay_to']);
     hide($content['relay_from']);
@@ -111,7 +111,7 @@ $googleShare =  'https://plus.google.com/share?url=' . $base_url;
     hide($content['comments']);
     hide($content['links']);
     hide($content['field_tags']);
-    //print render($content);
+    print render($content);
     ?>
 </div>
 <div class="small-12 column card_time_row"><span class="left"><?php print $cs_rawhashtag ?></span><span class="

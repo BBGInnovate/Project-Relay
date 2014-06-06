@@ -10,6 +10,8 @@ $cs_tid=taxonomy_term_load($node->relay_events_ref['und'][0]['tid']);
 $cs_items = field_get_items('taxonomy_term', $cs_tid, 'relay_hash_tag');
 $cs_first_item = array_shift($cs_items);
 $cs_rawhashtag = '#' . $cs_first_item['value'];
+} else {
+	$cs_rawhashtag = '';
 }
 ?>
 

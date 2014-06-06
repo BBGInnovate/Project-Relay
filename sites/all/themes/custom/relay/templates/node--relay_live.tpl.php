@@ -102,8 +102,8 @@ $googleShare =  'https://plus.google.com/share?url=' . $base_url;
     <?php
     //print render($content['FIELDNAME']);
     //print render($content);
-    hide($content['title']);
-    hide($content['body']);
+    //hide($content['title']);
+    //hide($content['body']);
     hide($content['relay_pin_card']);
     hide($content['relay_authors']);
     hide($content['relay_events_ref']);

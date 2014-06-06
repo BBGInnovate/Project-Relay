@@ -442,7 +442,7 @@ function _relay_card_types_live_fields( &$fields ) {
   //
   $fields[] = array(
     'field_name' => 'relay_live_embed_code', 
-    'type' => 'text_long', 
+    'type' => 'text_long',
     'locked' => TRUE, 
     'cardinality' => 1, 
     'storage' => array( 
@@ -457,8 +457,12 @@ function _relay_card_types_live_field_instances( &$instances ) {
   $instances[] = array(
     'field_name' => 'relay_live_embed_code', // From above.
     'label' => t('Embed Code'),
+    'format' => 'filter_html',    
     'widget' => array(
       'type' => 'text_textarea',
+    ),
+    'settings' => array(
+      'text_processing' => '1', //should set this to full html
     ),
     'display' => array(
       'default' => array(

@@ -1,3 +1,4 @@
+This repo of Relay will be deleted on 08/29/2014. We will open a new repo for the Relay 1.0 that will be residing at https://github.com/BBGInnovate/Relay-Classic
 
 CONTENTS OF THIS FILE
 ---------------------
